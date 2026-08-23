@@ -15,14 +15,14 @@ import {
 } from "@/services/learner";
 import { submitJava } from "@/services/submissions";
 import { ProgressBar } from "@/components/progress-bar";
-const router = useRouter();
 export function QuestWorkspace({
   quest,
   nextQuestSlug,
 }: {
   quest: QuestDetail;
   nextQuestSlug: string | null;
-}) { const items = useMemo(
+}) { const router = useRouter();
+const items = useMemo(
   () => [
     ...[...quest.lessons]
       .sort((a, b) => a.position - b.position)
