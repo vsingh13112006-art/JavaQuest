@@ -7,7 +7,10 @@ const envSchema = z
       .default("development"),
 
     DATABASE_URL: z.string().min(1),
-
+    ONLINECOMPILER_API_KEY: z.preprocess(
+  (value) => value === "" ? undefined : value,
+  z.string().min(20).optional(),
+),
     API_PORT: z.coerce.number().default(4000),
     WEB_ORIGIN: z.string().url().default("http://localhost:3000"),
     SESSION_TTL_DAYS: z.coerce.number().int().positive().default(30),
