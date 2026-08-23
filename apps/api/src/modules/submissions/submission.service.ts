@@ -19,13 +19,17 @@ export async function submitCode(userId: string, questSlug: string, exerciseSlug
   
   if (!enrollment) throw new AppError("COURSE_ENROLLMENT_REQUIRED", "Enroll in the course before submitting code", 409);
   
-  if (env.NODE_ENV === "production" && !env.RUNNER_SERVICE_URL) {
+  if (
+  env.NODE_ENV === "production" &&
+  !env.ONLINECOMPILER_API_KEY &&
+  !env.RUNNER_SERVICE_URL
+) {
   throw new AppError(
     "RUNNER_UNAVAILABLE",
     "Java code execution is temporarily unavailable",
     503,
   );
-  }  
+} 
   const submission = await prisma.submission.create({ data: { userId, exerciseId: exercise.id, sourceCode, status: "PENDING" } });
   const testResults: SubmissionResultDto["tests"] = [];
   let totalRuntime = 0;
