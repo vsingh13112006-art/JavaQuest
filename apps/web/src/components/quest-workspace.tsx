@@ -146,6 +146,9 @@ const items = useMemo(
               result={result}
               busy={busy}
               error={error}
+              completed={
+    progress?.completedExerciseSlugs.includes(current.slug) ?? false
+  }
               onRun={() => evaluate(current)}
               onNext={goNext}
             />
@@ -188,6 +191,7 @@ function Exercise({
   result,
   busy,
   error,
+  completed,
   onRun,
   onNext,
 }: {
@@ -197,6 +201,7 @@ function Exercise({
   result: SubmissionResultDto | null;
   busy: boolean;
   error: string;
+  completed: boolean;
   onRun: () => void;
   onNext: () => void;
 }) {
@@ -248,9 +253,19 @@ function Exercise({
           </div>
         </>
       ) : (
-        <button className="btn-primary" disabled={busy} onClick={onRun}>
-          {busy ? "Saving…" : "Mark complete"}
-        </button>
+        <div className="flex flex-wrap gap-3">
+  {!completed && (
+    <button className="btn-primary" disabled={busy} onClick={onRun}>
+      {busy ? "Saving…" : "Mark complete"}
+    </button>
+  )}
+
+  {completed && (
+    <button className="btn-primary" onClick={onNext}>
+      Continue →
+    </button>
+  )}
+</div>
       )}
       {error && (
         <div className="card !border-red-900 text-red-300">{error}</div>
