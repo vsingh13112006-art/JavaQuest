@@ -1,4 +1,5 @@
 "use client";
+import { LessonContent } from "@/components/lesson-content";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -175,9 +176,9 @@ function Lesson({
     <article className="card min-h-[480px] p-8">
       <p className="eyebrow">{kind}</p>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
-      <div className="mt-8 max-w-3xl whitespace-pre-wrap text-lg leading-8 text-slate-300">
-        {content}
-      </div>
+      <div className="mt-8">
+  <LessonContent content={content} />
+</div>
       <button className="btn-primary mt-12" onClick={onNext}>
         Continue →
       </button>

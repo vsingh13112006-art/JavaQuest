@@ -1,5 +1,4 @@
 import type { CourseDetail, CourseSummary } from "@javaquets/shared";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export async function getCourses(): Promise<CourseSummary[]> {
