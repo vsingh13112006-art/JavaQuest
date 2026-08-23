@@ -5,6 +5,7 @@ export type SubmissionTestResultDto = {
   hidden: boolean;
   passed: boolean;
   stdout: string | null;
+  expectedOutput: string | null;
 };
 
 export type SubmissionResultDto = {

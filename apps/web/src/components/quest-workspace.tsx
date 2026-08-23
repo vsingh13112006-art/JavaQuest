@@ -22,19 +22,20 @@ export function QuestWorkspace({
 }: {
   quest: QuestDetail;
   nextQuestSlug: string | null;
-}) { const router = useRouter();
-const items = useMemo(
-  () => [
-    ...[...quest.lessons]
-      .sort((a, b) => a.position - b.position)
-      .map((x) => ({ ...x, type: "lesson" as const })),
+}) {
+  const router = useRouter();
+  const items = useMemo(
+    () => [
+      ...[...quest.lessons]
+        .sort((a, b) => a.position - b.position)
+        .map((x) => ({ ...x, type: "lesson" as const })),
 
-    ...[...quest.exercises]
-      .sort((a, b) => a.position - b.position)
-      .map((x) => ({ ...x, type: "exercise" as const })),
-  ],
-  [quest],
-);
+      ...[...quest.exercises]
+        .sort((a, b) => a.position - b.position)
+        .map((x) => ({ ...x, type: "exercise" as const })),
+    ],
+    [quest],
+  );
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState<QuestProgressDto | null>(null);
   const [code, setCode] = useState(quest.exercises[0]?.starterCode ?? "");
@@ -70,21 +71,22 @@ const items = useMemo(
     } finally {
       setBusy(false);
     }
-  }function goNext() {
-  const isLastItem = index >= items.length - 1;
-
-  if (!isLastItem) {
-    setIndex(index + 1);
-    return;
   }
+  function goNext() {
+    const isLastItem = index >= items.length - 1;
 
-  if (nextQuestSlug) {
-    router.push(`/quests/${nextQuestSlug}`);
-    return;
+    if (!isLastItem) {
+      setIndex(index + 1);
+      return;
+    }
+
+    if (nextQuestSlug) {
+      router.push(`/quests/${nextQuestSlug}`);
+      return;
+    }
+
+    router.push(`/courses/${quest.module.courseSlug}`);
   }
-
-  router.push(`/courses/${quest.module.courseSlug}`);
-}
   const completed = progress?.completedExercises ?? 0;
   const pct = progress?.totalExercises
     ? (completed / progress.totalExercises) * 100
@@ -148,8 +150,8 @@ const items = useMemo(
               busy={busy}
               error={error}
               completed={
-    progress?.completedExerciseSlugs.includes(current.slug) ?? false
-  }
+                progress?.completedExerciseSlugs.includes(current.slug) ?? false
+              }
               onRun={() => evaluate(current)}
               onNext={goNext}
             />
@@ -177,8 +179,8 @@ function Lesson({
       <p className="eyebrow">{kind}</p>
       <h2 className="mt-3 text-3xl font-black">{title}</h2>
       <div className="mt-8">
-  <LessonContent content={content} />
-</div>
+        <LessonContent content={content} />
+      </div>
       <button className="btn-primary mt-12" onClick={onNext}>
         Continue →
       </button>
@@ -212,7 +214,9 @@ function Exercise({
       <article className="card">
         <p className="eyebrow">{exercise.kind.replace("_", " ")} exercise</p>
         <h2 className="mt-3 text-2xl font-black">{exercise.title}</h2>
-        <p className="mt-3 leading-7 text-slate-300">{exercise.prompt}</p>
+        <div className="mt-3 whitespace-pre-wrap leading-7 text-slate-300">
+          {exercise.prompt}
+        </div>{" "}
       </article>
       {exercise.kind === "CODE" ? (
         <>
@@ -255,18 +259,18 @@ function Exercise({
         </>
       ) : (
         <div className="flex flex-wrap gap-3">
-  {!completed && (
-    <button className="btn-primary" disabled={busy} onClick={onRun}>
-      {busy ? "Saving…" : "Mark complete"}
-    </button>
-  )}
+          {!completed && (
+            <button className="btn-primary" disabled={busy} onClick={onRun}>
+              {busy ? "Saving…" : "Mark complete"}
+            </button>
+          )}
 
-  {completed && (
-    <button className="btn-primary" onClick={onNext}>
-      Continue →
-    </button>
-  )}
-</div>
+          {completed && (
+            <button className="btn-primary" onClick={onNext}>
+              Continue →
+            </button>
+          )}
+        </div>
       )}
       {error && (
         <div className="card !border-red-900 text-red-300">{error}</div>
@@ -304,16 +308,45 @@ function ResultPanel({ result }: { result: SubmissionResultDto }) {
           {result.errorText}
         </pre>
       )}
-      <div className="mt-4 grid gap-2">
+      <div className="mt-4 grid gap-3">
         {result.tests.map((test) => (
           <div
             key={test.position}
-            className="flex justify-between rounded-lg bg-slate-950/60 px-3 py-2 text-sm"
+            className="rounded-lg bg-slate-950/60 px-3 py-3 text-sm"
           >
-            <span>{test.hidden ? "Hidden test" : `Test ${test.position}`}</span>
-            <span className={test.passed ? "text-emerald-300" : "text-red-300"}>
-              {test.passed ? "Passed" : "Failed"}
-            </span>
+            <div className="flex justify-between">
+              <span>
+                {test.hidden ? "Hidden test" : `Test ${test.position}`}
+              </span>
+
+              <span
+                className={test.passed ? "text-emerald-300" : "text-red-300"}
+              >
+                {test.passed ? "Passed" : "Failed"}
+              </span>
+            </div>
+            {!test.hidden && !test.passed && test.expectedOutput !== null && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Expected output
+                </p>
+
+                <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-emerald-200">
+                  {test.expectedOutput}
+                </pre>
+              </div>
+            )}
+            {!test.hidden && !test.passed && test.stdout !== null && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Your output
+                </p>
+
+                <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-slate-200">
+                  {test.stdout || "(no output)"}
+                </pre>
+              </div>
+            )}
           </div>
         ))}
       </div>

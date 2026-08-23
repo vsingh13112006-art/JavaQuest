@@ -48,11 +48,11 @@ export async function submitCode(userId: string, questSlug: string, exerciseSlug
     if (result.timedOut || result.outputLimitExceeded || result.exitCode !== 0) {
       status = "ERROR";
       errorText = result.timedOut ? "Execution timed out" : result.outputLimitExceeded ? "Execution output limit exceeded" : (result.stderr || "Compilation or runtime error");
-      testResults.push({ position: test.position, hidden: test.isHidden, passed: false, stdout: test.isHidden ? null : result.stdout });
+      testResults.push({ position: test.position, hidden: test.isHidden, passed: false, stdout: test.isHidden ? null : result.stdout ,expectedOutput: test.isHidden ? null : test.expectedOutput,});
       break;
     }
     const passed = normalize(result.stdout) === normalize(test.expectedOutput);
-    testResults.push({ position: test.position, hidden: test.isHidden, passed, stdout: test.isHidden ? null : result.stdout });
+    testResults.push({ position: test.position, hidden: test.isHidden, passed, stdout: test.isHidden ? null : result.stdout ,expectedOutput: test.isHidden ? null : test.expectedOutput,});
     if (!passed) status = "FAILED";
   }
 
