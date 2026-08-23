@@ -11,7 +11,132 @@ export type JavaRunResult = {
   exitCode: number | null; stdout: string; stderr: string; runtimeMs: number;
   timedOut: boolean; outputLimitExceeded: boolean;
 };
+type OnlineCompilerResponse = {
+  output?: string;
+  error?: string;
+  status?: string;
+  exit_code?: number;
+  signal?: number | null;
+  time?: string;
+  total?: string;
+  memory?: string;
+};
 
+async function runOnlineCompiler(
+  sourceCode: string,
+  stdin: string,
+  timeoutMs: number,
+): Promise<JavaRunResult> {
+  const started = Date.now();
+
+  const controller = new AbortController();
+
+  // OnlineCompiler sync API may run for up to 30s.
+  const clientTimeout = Math.min(Math.max(timeoutMs + 7000, 10000), 35000);
+
+  const timer = setTimeout(() => controller.abort(), clientTimeout);
+
+  try {
+    const response = await fetch(
+      "https://api.onlinecompiler.io/api/run-code-sync/",
+      {
+        method: "POST",
+        headers: {
+          Authorization: env.ONLINECOMPILER_API_KEY!,
+          "Content-Type": "application/json",
+          "X-Request-Id": randomUUID(),
+        },
+        body: JSON.stringify({
+          compiler: "openjdk-25",
+          code: sourceCode,
+          input: stdin,
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    if (!response.ok) {
+      increment("javaquets_runner_executions_total", {
+        outcome: response.status === 429 ? "busy" : "unavailable",
+      });
+
+      throw new AppError(
+        response.status === 429 ? "RUNNER_BUSY" : "RUNNER_UNAVAILABLE",
+        response.status === 429
+          ? "Execution capacity is temporarily full"
+          : "Execution service is temporarily unavailable",
+        503,
+      );
+    }
+
+    const result = (await response.json()) as OnlineCompilerResponse;
+
+    if (
+      typeof result.output !== "string" ||
+      typeof result.error !== "string" ||
+      typeof result.exit_code !== "number"
+    ) {
+      throw new Error("OnlineCompiler returned an invalid response");
+    }
+
+    const runtimeMs =
+      Number.isFinite(Number(result.time))
+        ? Math.round(Number(result.time) * 1000)
+        : Date.now() - started;
+
+    const timedOut =
+      result.exit_code === 124 ||
+      result.exit_code === 137 ||
+      result.signal === 9;
+
+    const stdout = result.output.slice(0, env.RUNNER_MAX_OUTPUT_BYTES);
+    const stderr = result.error.slice(0, env.RUNNER_MAX_OUTPUT_BYTES);
+
+    const outputLimitExceeded =
+      Buffer.byteLength(result.output) + Buffer.byteLength(result.error) >
+      env.RUNNER_MAX_OUTPUT_BYTES;
+
+    observe("javaquets_runner_duration_ms", runtimeMs);
+
+    increment("javaquets_runner_executions_total", {
+      outcome: timedOut
+        ? "timeout"
+        : outputLimitExceeded
+          ? "output_limit"
+          : result.exit_code === 0
+            ? "success"
+            : "error",
+    });
+
+    return {
+      exitCode: result.exit_code,
+      stdout,
+      stderr,
+      runtimeMs,
+      timedOut,
+      outputLimitExceeded,
+    };
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+
+    increment("javaquets_runner_executions_total", {
+      outcome: "unavailable",
+    });
+
+    throw new AppError(
+      "RUNNER_UNAVAILABLE",
+      "Execution service is temporarily unavailable",
+      503,
+    );
+  } finally {
+    clearTimeout(timer);
+
+    observe(
+      "javaquets_runner_request_duration_ms",
+      Date.now() - started,
+    );
+  }
+}
 async function runRemotely(sourceCode: string, stdin: string, timeoutMs: number): Promise<JavaRunResult> {
   const started = Date.now();
   const controller = new AbortController();
@@ -70,8 +195,20 @@ function removeContainer(name: string) {
   return new Promise<void>((resolve) => execFile("docker", ["rm", "-f", name], { timeout: 3000, windowsHide: true }, () => resolve()));
 }
 
-export async function runJavaSource(sourceCode: string, stdin = "", timeoutMs = 5000): Promise<JavaRunResult> {
-  if (env.RUNNER_SERVICE_URL) return runRemotely(sourceCode, stdin, timeoutMs);
+export async function runJavaSource(
+  sourceCode: string,
+  stdin = "",
+  timeoutMs = 5000
+): Promise<JavaRunResult> {
+
+  if (env.ONLINECOMPILER_API_KEY) {
+    return runOnlineCompiler(sourceCode, stdin, timeoutMs);
+  }
+
+  if (env.RUNNER_SERVICE_URL) {
+    return runRemotely(sourceCode, stdin, timeoutMs);
+  }
+
   const release = await acquire();
   const containerName = `javaquets-${randomUUID()}`;
   let dir: string | undefined;
