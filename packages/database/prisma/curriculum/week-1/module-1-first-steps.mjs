@@ -1,10 +1,4 @@
-export const firstStepsModule = {
-  slug: "week-1-first-steps",
-  title: "Week 1 — First Steps in Java",
-  position: 1,
-
-  quests: {
-    create: [
+export const firstStepsModule = 
       {
         // =====================================================
         // MODULE 1 — First Steps in Java
@@ -622,6 +616,3 @@ Goal: Build awesome things!
           ],
         },
       }
-    ],
-  },
-};
