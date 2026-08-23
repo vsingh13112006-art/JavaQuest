@@ -21,7 +21,7 @@ async function main() {
     slug: courseSlug,
     title: "Java Mastery Path",
     description:
-      "A self-paced 8-stage journey from Java fundamentals to advanced programming. Learn concepts through short lessons, prediction exercises, coding challenges, and milestone projects.",
+      "8-stage self-paced Java journey — basics se advanced tak. Short Hinglish lessons, coding challenges, practice quests aur milestone projects ke through seekho.",
     status: "PUBLISHED",
     difficulty: "BEGINNER",
 
@@ -31,7 +31,7 @@ async function main() {
           slug: "week-1-first-steps",
           title: "Week 1 — First Steps in Java",
           description:
-            "Learn how Java programs are structured, print console output, understand comments, and build your first complete Java program.",
+            "Java program ka basic structure samjho, console output print karo, comments use karo aur apna pehla complete Java program build karo.",
           position: 1,
 
           quests: {
@@ -43,7 +43,7 @@ async function main() {
                 slug: "welcome-to-java",
                 title: "Welcome to Java",
                 description:
-                  "Understand what Java is and how your code becomes a running program.",
+                  "Java kya hai aur tumhara code actual running program kaise banta hai — simple Hinglish me samjho.",
                 status: "PUBLISHED",
                 difficulty: "BEGINNER",
                 position: 1,
@@ -56,44 +56,77 @@ async function main() {
                       title: "What is Java?",
                       kind: "THEORY",
                       position: 1,
-                      content: `Java is a programming language used to build backend systems, desktop applications, Android applications, developer tools, and large enterprise software.
+                      content: String.raw`
+Java ek **programming language** hai jiska use backend systems, Android apps, desktop software aur large-scale applications banane me hota hai.
 
-In JavaQuets, you do not need to install Java before you begin. You can write Java directly in the browser and run it against real tests.
+JavaQuets me abhi tumhe Java locally install karne ki zarurat nahi hai. Tum browser me code likhoge aur real Java execution ke against test karoge.
 
-A useful mental model is:
+## Simple mental model
 
-Your Java Code
-↓
-Java Compiler
-↓
-Java Bytecode
-↓
-JVM
-↓
-Your Program Runs
+~~~text
+Tumhara Java Code
+        ↓
+   Java Compiler
+        ↓
+    Bytecode
+        ↓
+       JVM
+        ↓
+ Program Run Hota Hai
+~~~
 
-The JDK contains tools used to develop and compile Java programs.
+## JDK kya hai?
 
-The JVM — Java Virtual Machine — executes compiled Java bytecode.
+**JDK (Java Development Kit)** me wo tools hote hain jinse Java code develop aur compile kiya jata hai.
 
-You do not need to memorize the internals yet. For now, remember:
+## JVM kya hai?
 
-You write Java code.
-The compiler prepares it.
-The JVM runs it.`,
+**JVM (Java Virtual Machine)** compiled Java bytecode ko execute karti hai.
+
+> 💡 **Abhi bas itna yaad rakho:**  
+> Tum Java code likhte ho → compiler usse prepare karta hai → JVM usse run karti hai.
+
+Internals ko abhi ratne ki zarurat nahi. Hum aage step-by-step detail me jayenge.
+`,
                     },
                     {
                       slug: "java-platform-mental-model",
                       title: "Code → Compiler → JVM",
                       kind: "EXAMPLE",
                       position: 2,
-                      content: `Suppose you write a file named Main.java.
+                      content: String.raw`
+Maan lo tumne ek file likhi:
 
-The Java compiler checks the program and turns it into Java bytecode.
+~~~text
+Main.java
+~~~
 
-The JVM then executes that bytecode.
+Java compiler tumhare program ko check karta hai aur usse **bytecode** me convert karta hai.
 
-This is one reason Java programs can run on many different operating systems.`,
+Uske baad JVM us bytecode ko run karti hai.
+
+## Iska fayda kya hai?
+
+Isi model ki wajah se Java ka famous idea aata hai:
+
+> **Write Once, Run Anywhere**
+
+Matlab same Java program alag operating systems par JVM ke through run ho sakta hai.
+
+## Quick recap
+
+~~~text
+Main.java
+   ↓
+Compiler
+   ↓
+Bytecode
+   ↓
+JVM
+   ↓
+Output
+~~~
+`,
                     },
                   ],
                 },
@@ -121,7 +154,7 @@ This is one reason Java programs can run on many different operating systems.`,
                 slug: "your-first-java-program",
                 title: "Your First Java Program",
                 description:
-                  "Meet the basic structure of a Java program and print your first message.",
+                  "Java program ka basic structure samjho aur apna pehla message console par print karo.",
                 status: "PUBLISHED",
                 difficulty: "BEGINNER",
                 position: 2,
@@ -134,44 +167,68 @@ This is one reason Java programs can run on many different operating systems.`,
                       title: "The Shape of a Java Program",
                       kind: "THEORY",
                       position: 1,
-                      content: `Here is a complete Java program:
+                      content: String.raw`
+Java ka ek basic complete program kuch aisa dikhta hai:
 
+~~~java
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, Java!");
     }
 }
+~~~
 
-The program lives inside a class named Main.
+## Simple breakdown
 
-Java starts this basic command-line program from the main method.
+**public class Main**  
+Ye hamari class hai. Abhi bas itna samjho ki Java code generally classes ke andar organize hota hai.
 
-System.out.println(...) prints something to the console.
+**main()**  
+Basic Java program ki execution yahin se start hoti hai.
 
-Most Java statements end with a semicolon.
+**System.out.println(...)**  
+Console par output print karta hai.
 
-You do not need to understand every word in:
+**Semicolon ;**  
+Java me most statements semicolon par end hote hain.
 
-public static void main(String[] args)
+> 💡 **Abhi tension mat lo:**  
+> public, static, void aur String[] args ko abhi memorize karne ki zarurat nahi hai.  
+> Methods aur OOP ke time in sab ko properly samjhenge.
 
-yet.
+## Yaad rakho
 
-For now, treat it as the starting point of your program. We will understand each part later.`,
+- Program ka starting point: **main()**
+- Output print karna: **System.out.println(...)**
+- Most statements ka ending: **;**
+`,
                     },
                     {
                       slug: "println-example",
                       title: "Your First println",
                       kind: "EXAMPLE",
                       position: 2,
-                      content: `This statement:
+                      content: String.raw`
+Console par text print karne ke liye hum **System.out.println(...)** use karte hain.
 
+## Example
+
+~~~java
 System.out.println("JavaQuets");
+~~~
 
-prints:
+Output:
 
+~~~text
 JavaQuets
+~~~
 
-Text written inside double quotes is printed as text.`,
+Double quotes ke andar jo text likha hota hai, wahi console par print hota hai.
+
+> 🧠 **Quick check:**  
+> Agar hum likhen: System.out.println("Hello");  
+> to output hoga: **Hello**
+`,
                     },
                   ],
                 },
@@ -221,7 +278,7 @@ Text written inside double quotes is printed as text.`,
                 slug: "printing-output",
                 title: "Printing Output",
                 description:
-                  "Use print and println to control exactly what appears in the console.",
+                  "print aur println ka difference samjho aur console output ko exactly control karna seekho.",
                 status: "PUBLISHED",
                 difficulty: "BEGINNER",
                 position: 3,
@@ -234,55 +291,76 @@ Text written inside double quotes is printed as text.`,
                       title: "print vs println",
                       kind: "THEORY",
                       position: 1,
-                      content: `Java gives us two useful ways to print console output.
+                      content: String.raw`
+Java me output print karne ke do common tareeke hain:
 
-println prints a value and then moves to a new line.
+## println
 
-Example:
+**println** value print karta hai aur uske baad next line par chala jata hai.
 
+~~~java
 System.out.println("Java");
 System.out.println("Quets");
+~~~
 
 Output:
 
+~~~text
 Java
 Quets
+~~~
 
-print does not automatically move to a new line.
+## print
 
-Example:
+**print** value print karta hai, lekin automatically next line par nahi jata.
 
+~~~java
 System.out.print("Java");
 System.out.print("Quets");
+~~~
 
 Output:
 
+~~~text
 JavaQuets
+~~~
 
-A simple mental model:
-
-println = print + new line
-print   = stay on the same line`,
+> 💡 **Shortcut:**  
+> println = print + new line  
+> print = same line par continue
+`,
                     },
                     {
                       slug: "combine-print-statements",
                       title: "Combining Output",
                       kind: "EXAMPLE",
                       position: 2,
-                      content: `Consider:
+                      content: String.raw`
+Ab ye code dekho:
 
+~~~java
 System.out.print("Learn ");
 System.out.println("Java");
 System.out.println("Build things");
+~~~
 
-The first print stays on the same line.
+Pehla **print** same line par rehta hai.
 
-The next println prints Java and then moves down.
+Doosra **println** Java print karke next line par chala jata hai.
 
-The output becomes:
+Final output:
 
+~~~text
 Learn Java
-Build things`,
+Build things
+~~~
+
+## Predict karo
+
+Agar pehli line me println hota, to output ka layout kaise change hota?
+
+Code ko mentally trace karna programming ka important skill hai.
+`,
                     },
                   ],
                 },
@@ -338,7 +416,7 @@ Let's build!`,
                 slug: "comments-and-clean-code",
                 title: "Comments & Clean Code",
                 description:
-                  "Use comments to explain code and temporarily prevent statements from running.",
+                  "Comments ka use code explain karne aur kisi statement ko temporarily run hone se rokne ke liye karo.",
                 status: "PUBLISHED",
                 difficulty: "BEGINNER",
                 position: 4,
@@ -351,49 +429,67 @@ Let's build!`,
                       title: "Comments are for Humans",
                       kind: "THEORY",
                       position: 1,
-                      content: `Comments help humans understand code.
+                      content: String.raw`
+Comments **humans ke liye** hote hain. Java program run karte waqt comments ko ignore karta hai.
 
-Java ignores comments when the program runs.
+## Single-line comment
 
-A single-line comment begins with:
+Single-line comment **//** se start hota hai.
 
-// comment
-
-Example:
-
-// Print the welcome message
+~~~java
+// Welcome message print karo
 System.out.println("Welcome");
+~~~
 
-A multi-line comment uses:
+## Multi-line comment
 
+Multiple lines ke liye:
+
+~~~java
 /*
-  Multiple lines
-  can go here.
+  Ye ek multi-line
+  comment hai.
 */
+~~~
 
-Good comments explain why something exists or make code easier to understand.
+## Good comment kab likhna chahiye?
 
-Comments should not be used to explain every obvious statement.`,
+Achha comment code ka **reason** ya important context explain karta hai.
+
+Har obvious line ko comment karna zaroori nahi.
+
+> 💡 **Rule:**  
+> Code kya kar raha hai wo code se clear hona chahiye.  
+> Comment useful context ya "kyun" explain kare.
+`,
                     },
                     {
                       slug: "comments-change-execution",
                       title: "Commenting Out Code",
                       kind: "EXAMPLE",
                       position: 2,
-                      content: `Consider:
+                      content: String.raw`
+Ye code dekho:
 
+~~~java
 System.out.println("A");
 
 // System.out.println("B");
 
 System.out.println("C");
+~~~
 
-The second statement is a comment, so Java ignores it.
+Middle wali statement comment ban chuki hai, isliye Java usse execute nahi karega.
 
 Output:
 
+~~~text
 A
-C`,
+C
+~~~
+
+Isi technique ko kabhi-kabhi debugging ke time kisi line ko temporarily disable karne ke liye use kiya jata hai.
+`,
                     },
                   ],
                 },
@@ -456,7 +552,7 @@ Finish`,
                 slug: "build-your-profile",
                 title: "Milestone: Build Your Java Profile",
                 description:
-                  "Combine everything from this module to build your first small Java program.",
+                  "Module me jo seekha hai use combine karke apna pehla small Java program build karo.",
                 status: "PUBLISHED",
                 difficulty: "BEGINNER",
                 position: 5,
@@ -469,13 +565,27 @@ Finish`,
                       title: "Your First Mini Build",
                       kind: "THEORY",
                       position: 1,
-                      content: `You have now seen the basic shape of a Java program, the main method, console output, print, println, semicolons, and comments.
+                      content: String.raw`
+Ab tak tumne ye concepts dekhe hain:
 
-Now you will combine those ideas without copying a complete solution.
+- Java program ka basic structure
+- main method
+- System.out.print
+- System.out.println
+- semicolon
+- comments
 
-Your mission is to build a small console profile.
+Ab in sab ko combine karke apna pehla **mini build** banana hai.
 
-For this challenge, use the provided profile information exactly so JavaQuets can automatically verify your program.`,
+## Mission
+
+Ek console profile build karo.
+
+Is challenge me provided profile information exactly use karna, taaki JavaQuets tumhare output ko automatically verify kar sake.
+
+> 🏆 **Challenge mode:**  
+> Complete solution pehle se copy mat karo. Jo concepts seekhe hain unhe use karke khud build karne ki koshish karo.
+`,
                     },
                   ],
                 },
