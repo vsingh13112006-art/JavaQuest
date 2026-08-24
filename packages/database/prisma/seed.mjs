@@ -164,28 +164,35 @@ async function syncQuests(tx, moduleId, questsRelation) {
 
 async function syncModules(tx, courseId, modules) {
   for (const module of modules) {
-    const savedModule = await tx.courseModule.upsert({
-      where: {
-        courseId_slug: {
+    console.log(
+      `Syncing module ${module.position}: ${module.title}`,
+    );
+
+    const savedModule =
+      await tx.courseModule.upsert({
+        where: {
+          courseId_slug: {
+            courseId,
+            slug: module.slug,
+          },
+        },
+
+        update: {
+          title: module.title,
+          description:
+            module.description ?? null,
+          position: module.position,
+        },
+
+        create: {
           courseId,
           slug: module.slug,
+          title: module.title,
+          description:
+            module.description ?? null,
+          position: module.position,
         },
-      },
-
-      update: {
-        title: module.title,
-        description: module.description ?? null,
-        position: module.position,
-      },
-
-      create: {
-        courseId,
-        slug: module.slug,
-        title: module.title,
-        description: module.description ?? null,
-        position: module.position,
-      },
-    });
+      });
 
     await syncQuests(
       tx,
@@ -207,71 +214,63 @@ async function main() {
   const passwordHash =
     `scrypt$${salt}$${key.toString("hex")}`;
 
-  await prisma.$transaction(
-    async (tx) => {
-      // --------------------------------------------
-      // ADMIN
-      // --------------------------------------------
+  // --------------------------------------------
+  // ADMIN
+  // --------------------------------------------
 
-      await tx.user.upsert({
-        where: {
-          email: "admin@javaquets.dev",
-        },
-
-        update: {
-          role: "ADMIN",
-          passwordHash,
-        },
-
-        create: {
-          email: "admin@javaquets.dev",
-          displayName: "JavaQuets Admin",
-          role: "ADMIN",
-          passwordHash,
-        },
-      });
-
-      // --------------------------------------------
-      // COURSE
-      // --------------------------------------------
-
-      const course = await tx.course.upsert({
-        where: {
-          slug: "java-foundations",
-        },
-
-        update: {
-          title: "Java Mastery Path",
-          description:
-            "8-stage self-paced Java journey — basics se advanced tak. Short Hinglish lessons, coding challenges, practice quests aur milestone projects ke through seekho.",
-          status: "PUBLISHED",
-          difficulty: "BEGINNER",
-        },
-
-        create: {
-          slug: "java-foundations",
-          title: "Java Mastery Path",
-          description:
-            "8-stage self-paced Java journey — basics se advanced tak. Short Hinglish lessons, coding challenges, practice quests aur milestone projects ke through seekho.",
-          status: "PUBLISHED",
-          difficulty: "BEGINNER",
-        },
-      });
-
-      // --------------------------------------------
-      // CURRICULUM
-      // --------------------------------------------
-
-      await syncModules(
-        tx,
-        course.id,
-        javaMasteryModules,
-      );
+  await prisma.user.upsert({
+    where: {
+      email: "admin@javaquets.dev",
     },
-    {
-      maxWait: 10_000,
-      timeout: 60_000,
+
+    update: {
+      role: "ADMIN",
+      passwordHash,
     },
+
+    create: {
+      email: "admin@javaquets.dev",
+      displayName: "JavaQuets Admin",
+      role: "ADMIN",
+      passwordHash,
+    },
+  });
+
+  // --------------------------------------------
+  // COURSE
+  // --------------------------------------------
+
+  const course = await prisma.course.upsert({
+    where: {
+      slug: "java-foundations",
+    },
+
+    update: {
+      title: "Java Mastery Path",
+      description:
+        "8-stage self-paced Java journey — basics se advanced tak. Short Hinglish lessons, coding challenges, practice quests aur milestone projects ke through seekho.",
+      status: "PUBLISHED",
+      difficulty: "BEGINNER",
+    },
+
+    create: {
+      slug: "java-foundations",
+      title: "Java Mastery Path",
+      description:
+        "8-stage self-paced Java journey — basics se advanced tak. Short Hinglish lessons, coding challenges, practice quests aur milestone projects ke through seekho.",
+      status: "PUBLISHED",
+      difficulty: "BEGINNER",
+    },
+  });
+
+  // --------------------------------------------
+  // CURRICULUM
+  // --------------------------------------------
+
+  await syncModules(
+    prisma,
+    course.id,
+    javaMasteryModules,
   );
 
   console.log(
