@@ -240,7 +240,7 @@ Hello!
 
 ## Important Structure Rule
 
-> 💡 Method ko `main()` ke andar define nahi karte. Method **class ke andar**, lekin `main()` ke bahar hota hai.
+> 💡 Method ko main() ke andar define nahi karte. Method **class ke andar**, lekin main() ke bahar hota hai.
 `,
             },
 

@@ -202,7 +202,7 @@ JavaQuets
 
 Double quotes ke andar jo text likha hota hai, wahi console par print hota hai.
 
-> 💡 `println` text print karne ke baad cursor ko next line par le jata hai.
+> 💡 println text print karne ke baad cursor ko next line par le jata hai.
 
 > 🧠 **Quick check:**  
 > Agar hum likhen: System.out.println("Hello");  

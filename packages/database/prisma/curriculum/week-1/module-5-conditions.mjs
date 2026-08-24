@@ -900,7 +900,7 @@ if block run nahi karega.
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
-## OR (`||`)
+## OR (||)
 
 ~~~java
 boolean premium = false;
@@ -919,7 +919,7 @@ At least ek true hai.
 Discount
 ~~~
 
-## NOT (`!`)
+## NOT (!)
 
 ~~~java
 boolean banned = false;
@@ -1630,7 +1630,7 @@ switch
 → simple two-way value selection
 ~~~
 
-> 💡 **Remember:** First matching `else if` branch wins.
+> 💡 **Remember:** First matching else if branch wins.
 `,
             },
           ],

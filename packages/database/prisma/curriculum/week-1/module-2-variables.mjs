@@ -799,7 +799,7 @@ Single quotes use karta hai.
 String letter = "J";
 ~~~
 
-Ye **String** hai because `"J"` double quotes ke andar hai.
+Ye **String** hai because "J" double quotes ke andar hai.
 
 Lekin:
 
@@ -807,7 +807,7 @@ Lekin:
 char letter = 'J';
 ~~~
 
-Ye **char** hai because `'J'` single quotes me hai.
+Ye **char** hai because 'J' single quotes me hai.
 
 ## Quick Check
 
@@ -826,7 +826,7 @@ Ye invalid hai:
 char language = 'Java';
 ~~~
 
-`char` sirf ek character ke liye hota hai.
+char sirf ek character ke liye hota hai.
 
 Correct:
 
@@ -879,7 +879,7 @@ Wrong:
 char grade = "A";
 ~~~
 
-`"A"` double quotes me hai, isliye ye String value hai.
+"A" double quotes me hai, isliye ye String value hai.
 
 Correct:
 
@@ -895,7 +895,7 @@ char grade = 'A';
 'J'     → char
 ~~~
 
-Sirf ek character likha hone ka matlab ye nahi ki wo automatically `char` hai.
+Sirf ek character likha hone ka matlab ye nahi ki wo automatically char hai.
 
 Quotes decide karte hain:
 
@@ -904,7 +904,7 @@ Double quotes → String
 Single quotes → char
 ~~~
 
-Lekin `char` ke andar sirf **ek character** hona chahiye.
+Lekin char ke andar sirf **ek character** hona chahiye.
 
 ~~~java
 String a = "A";
@@ -914,7 +914,7 @@ char b = 'A';
 Dono visually similar lag sakte hain, lekin Java me **same type nahi hain**.
 
 > 💡 **Yaad rakho:**  
-> `"A"` aur `'A'` ka type different hai.
+> "A" aur 'A' ka type different hai.
 `,
             },
           ],
@@ -1134,7 +1134,7 @@ Wrong:
 boolean learningJava = "true";
 ~~~
 
-`"true"` double quotes ke andar hai, isliye wo **String text** hai.
+"true" double quotes ke andar hai, isliye wo **String text** hai.
 
 Actual boolean value:
 
@@ -1143,7 +1143,7 @@ true
 ~~~
 
 > 💡 **Simple rule:**  
-> boolean = `true` ya `false`  
+> boolean = true ya false  
 > Quotes nahi lagane.
 `,
             },
@@ -1219,7 +1219,7 @@ boolean isOnline = false;
 isOnline = true;
 ~~~
 
-Dobara `boolean` likhne ki zarurat nahi.
+Dobara boolean likhne ki zarurat nahi.
 
 > 💡 Pehli baar declaration me type likho. Update ke waqt sirf variable ko new value assign karo.
 `,
@@ -1273,7 +1273,7 @@ multiple conditions combine karna
 Lekin abhi focus simple hai:
 
 - boolean variable banana
-- `true` / `false` store karna
+- true / false store karna
 - value update karna
 - value print karna
 
@@ -1567,7 +1567,7 @@ coins + 5
   15
 ~~~
 
-Ab result wapas `coins` me store hota hai:
+Ab result wapas coins me store hota hai:
 
 ~~~text
 coins = 15
@@ -1634,7 +1634,7 @@ Lekin output hoga:
 
 ## Kyun?
 
-Dono variables `int` hain.
+Dono variables int hain.
 
 Java integer division me decimal part remove kar deta hai.
 
@@ -1646,7 +1646,7 @@ Java integer division me decimal part remove kar deta hai.
 
 ## Decimal Result Chahiye?
 
-`double` use karo:
+double use karo:
 
 ~~~java
 double a = 5.0;
@@ -1679,8 +1679,8 @@ Output:
 ~~~
 
 > 💡 **Simple rule:**  
-> Whole-number calculations → `int` useful ho sakta hai.  
-> Decimal result important ho → `double` use karo.
+> Whole-number calculations → int useful ho sakta hai.  
+> Decimal result important ho → double use karo.
 `,
             },
           ],
@@ -1941,13 +1941,13 @@ Output:
 
 ## Kya Hua?
 
-`score` ek `int` tha:
+score ek int tha:
 
 ~~~text
 100
 ~~~
 
-`finalScore` ek `double` hai.
+finalScore ek double hai.
 
 Java ne automatically convert kiya:
 
@@ -1955,7 +1955,7 @@ Java ne automatically convert kiya:
 100 → 100.0
 ~~~
 
-Ye conversion generally safe hai because `double` decimal values bhi handle kar sakta hai.
+Ye conversion generally safe hai because double decimal values bhi handle kar sakta hai.
 
 ## Ek Aur Example
 
@@ -1974,7 +1974,7 @@ Output:
 ~~~
 
 > 💡 **Simple rule:**  
-> `int → double` conversion Java usually automatically kar sakta hai.
+> int → double conversion Java usually automatically kar sakta hai.
 `,
             },
 
@@ -1986,7 +1986,7 @@ Output:
               content: String.raw`
 Reverse direction thodi different hai.
 
-Agar `double` value ko `int` me convert karna ho, to hume explicitly **cast** karna padta hai.
+Agar double value ko int me convert karna ho, to hume explicitly **cast** karna padta hai.
 
 ## Example
 
@@ -2006,7 +2006,7 @@ Output:
 
 ## Important
 
-Java `99.99` ko round karke `100` nahi bana raha.
+Java 99.99 ko round karke 100 nahi bana raha.
 
 Decimal part remove ho raha hai.
 
@@ -2038,7 +2038,7 @@ Output:
 87
 ~~~
 
-> 💡 `double → int` karte waqt decimal part lose ho sakta hai.
+> 💡 double → int karte waqt decimal part lose ho sakta hai.
 `,
             },
 
@@ -2313,7 +2313,7 @@ to Java compile error dega.
 
 ## final Ka Matlab
 
-`final` lagane ke baad variable ko dobara assign nahi kar sakte.
+final lagane ke baad variable ko dobara assign nahi kar sakte.
 
 Example:
 
@@ -2341,7 +2341,7 @@ final variable
 ~~~
 
 > 💡 **Simple rule:**  
-> Fixed rule/value ke liye `final` useful hai.
+> Fixed rule/value ke liye final useful hai.
 `,
             },
 
@@ -2372,7 +2372,7 @@ APP_NAME
 
 ## Important
 
-`UPPER_SNAKE_CASE` compiler ki requirement nahi hai.
+UPPER_SNAKE_CASE compiler ki requirement nahi hai.
 
 Java technically ye bhi allow karega:
 
@@ -2408,7 +2408,7 @@ int score = 10;
 final int MAX_SCORE = 100;
 ~~~
 
-`score` player ki current state represent kar raha hai.
+score player ki current state represent kar raha hai.
 
 Ye change ho sakta hai:
 
@@ -2416,7 +2416,7 @@ Ye change ho sakta hai:
 score = 20;
 ~~~
 
-`MAX_SCORE` game ka fixed rule represent kar raha hai.
+MAX_SCORE game ka fixed rule represent kar raha hai.
 
 Isliye ise reassign nahi karna chahiye.
 
@@ -2438,7 +2438,7 @@ Fixed rule / fixed value
 → final constant
 ~~~
 
-> 💡 Har value ko constant mat banao. `final` tab use karo jab value logically fixed rehni chahiye.
+> 💡 Har value ko constant mat banao. final tab use karo jab value logically fixed rehni chahiye.
 `,
             },
           ],
