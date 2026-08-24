@@ -49,7 +49,7 @@ Lekin agar 100 baar print karna ho?
 Programming me repeated tasks automate karne ke liye hum **loops** use karte hain.
 
 
-## Loop ka basic idea
+## Loop Ka Basic Idea
 
 ~~~text
 Start
@@ -218,7 +218,7 @@ for loop ke teen important parts:
 for (int i = 1; i <= 5; i++)
 ~~~
 
-Breakdown:
+## for Loop Breakdown
 
 ~~~text
 int i = 1
@@ -235,7 +235,7 @@ update
 ~~~
 
 
-Loop flow:
+## Loop Flow
 
 ~~~text
 i = 1
@@ -284,7 +284,7 @@ for (int i = 1; i <= 3; i++) {
 }
 ~~~
 
-Trace:
+## Step-by-Step Trace
 
 ~~~text
 i = 1
@@ -713,7 +713,7 @@ Output:
 ~~~
 
 
-Flow:
+## Loop Flow
 
 ~~~text
 lives = 3
@@ -738,7 +738,7 @@ false.
 Loop stop.
 
 
-while syntax:
+## while Syntax
 
 ~~~java
 while (condition) {
@@ -789,9 +789,9 @@ while (lives > 0) {
 ~~~
 
 
-Important question:
+## Stop Condition Check
 
-> Har loop likhte waqt socho — ye loop stop kaise hoga?
+> 💡 Har loop likhte waqt socho — **ye loop stop kaise hoga?**
 `,
             },
           ],
@@ -974,7 +974,7 @@ Output:
 ~~~
 
 
-Key difference:
+## Key Difference
 
 ~~~text
 while
@@ -1180,7 +1180,7 @@ execute hota hai.
 Loop completely stop.
 
 
-Mental model:
+## Mental Model
 
 ~~~text
 loop
@@ -1229,7 +1229,7 @@ Output:
 Lekin loop 4 aur 5 ke liye continue hua.
 
 
-Difference:
+## Pattern Difference
 
 ~~~text
 break
@@ -1427,7 +1427,7 @@ Output:
 
 Har iteration par condition check hoti hai.
 
-Flow:
+## Loop Flow
 
 ~~~text
 i = 1
@@ -1464,7 +1464,7 @@ Repeat + Decide
               content: String.raw`
 Module 3 me tumne modulus seekha tha.
 
-Even number ka pattern:
+## Even Number Pattern
 
 ~~~text
 number % 2 == 0
@@ -1666,7 +1666,7 @@ Output:
 ~~~
 
 
-Trace:
+## Step-by-Step Trace
 
 ~~~text
 total = 0
@@ -1736,7 +1736,7 @@ Count:
 ~~~
 
 
-Difference:
+## Pattern Difference
 
 ~~~text
 accumulator
@@ -1908,6 +1908,8 @@ Is module me tumne seekha:
 - accumulators
 
 
+## Final Mission
+
 Final challenge me user ek number enter karega.
 
 Suppose:
@@ -1930,7 +1932,7 @@ Total: 15
 ~~~
 
 
-Program ko:
+## Program Ko Kya Karna Hai?
 
 1. input read karna hai
 2. loop chalana hai
@@ -1948,7 +1950,7 @@ Ye Week 1 ke multiple modules ko combine karta hai.
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Quick recap:
+## Quick Recap
 
 ~~~text
 for
@@ -1968,7 +1970,7 @@ continue
 ~~~
 
 
-Problem-solving patterns:
+## Problem-Solving Patterns
 
 ~~~text
 counter
@@ -1979,7 +1981,7 @@ accumulator
 ~~~
 
 
-Powerful combination:
+## Powerful Combination
 
 ~~~text
 Input

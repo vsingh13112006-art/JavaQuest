@@ -36,7 +36,7 @@ Java ek **programming language** hai jiska use backend systems, Android apps, de
 
 JavaQuets me abhi tumhe Java locally install karne ki zarurat nahi hai. Tum browser me code likhoge aur real Java execution ke against test karoge.
 
-## Simple mental model
+## Simple Mental Model
 
 ~~~text
 Tumhara Java Code
@@ -50,11 +50,11 @@ Tumhara Java Code
  Program Run Hota Hai
 ~~~
 
-## JDK kya hai?
+## JDK Kya Hai?
 
 **JDK (Java Development Kit)** me wo tools hote hain jinse Java code develop aur compile kiya jata hai.
 
-## JVM kya hai?
+## JVM Kya Hai?
 
 **JVM (Java Virtual Machine)** compiled Java bytecode ko execute karti hai.
 
@@ -78,9 +78,11 @@ Main.java
 
 Java compiler tumhare program ko check karta hai aur usse **bytecode** me convert karta hai.
 
+## Execution Flow
+
 Uske baad JVM us bytecode ko run karti hai.
 
-## Iska fayda kya hai?
+## Iska Fayda Kya Hai?
 
 Isi model ki wajah se Java ka famous idea aata hai:
 
@@ -88,7 +90,7 @@ Isi model ki wajah se Java ka famous idea aata hai:
 
 Matlab same Java program alag operating systems par JVM ke through run ho sakta hai.
 
-## Quick recap
+## Quick Recap
 
 ~~~text
 Main.java
@@ -153,7 +155,7 @@ public class Main {
 }
 ~~~
 
-## Simple breakdown
+## Program Breakdown
 
 **public class Main**  
 Ye hamari class hai. Abhi bas itna samjho ki Java code generally classes ke andar organize hota hai.
@@ -171,7 +173,7 @@ Java me most statements semicolon par end hote hain.
 > public, static, void aur String[] args ko abhi memorize karne ki zarurat nahi hai.  
 > Methods aur OOP ke time in sab ko properly samjhenge.
 
-## Yaad rakho
+## Yaad Rakho
 
 - Program ka starting point: **main()**
 - Output print karna: **System.out.println(...)**
@@ -192,13 +194,15 @@ Console par text print karne ke liye hum **System.out.println(...)** use karte h
 System.out.println("JavaQuets");
 ~~~
 
-Output:
+### Output
 
 ~~~text
 JavaQuets
 ~~~
 
 Double quotes ke andar jo text likha hota hai, wahi console par print hota hai.
+
+> 💡 `println` text print karne ke baad cursor ko next line par le jata hai.
 
 > 🧠 **Quick check:**  
 > Agar hum likhen: System.out.println("Hello");  
@@ -278,7 +282,7 @@ System.out.println("Java");
 System.out.println("Quets");
 ~~~
 
-Output:
+### Output
 
 ~~~text
 Java
@@ -294,7 +298,7 @@ System.out.print("Java");
 System.out.print("Quets");
 ~~~
 
-Output:
+### Output
 
 ~~~text
 JavaQuets
@@ -323,14 +327,14 @@ Pehla **print** same line par rehta hai.
 
 Doosra **println** Java print karke next line par chala jata hai.
 
-Final output:
+## Final Output
 
 ~~~text
 Learn Java
 Build things
 ~~~
 
-## Predict karo
+## Predict Karo
 
 Agar pehli line me println hota, to output ka layout kaise change hota?
 
@@ -407,7 +411,7 @@ Let's build!`,
                     content: String.raw`
 Comments **humans ke liye** hote hain. Java program run karte waqt comments ko ignore karta hai.
 
-## Single-line comment
+## Single-Line Comment
 
 Single-line comment **//** se start hota hai.
 
@@ -416,7 +420,7 @@ Single-line comment **//** se start hota hai.
 System.out.println("Welcome");
 ~~~
 
-## Multi-line comment
+## Multi-Line Comment
 
 Multiple lines ke liye:
 
@@ -427,7 +431,7 @@ Multiple lines ke liye:
 */
 ~~~
 
-## Good comment kab likhna chahiye?
+## Good Comment Kab Likhen?
 
 Achha comment code ka **reason** ya important context explain karta hai.
 
@@ -456,7 +460,9 @@ System.out.println("C");
 
 Middle wali statement comment ban chuki hai, isliye Java usse execute nahi karega.
 
-Output:
+## Execution Trace
+
+### Output
 
 ~~~text
 A
@@ -541,6 +547,8 @@ Finish`,
                     kind: "THEORY",
                     position: 1,
                     content: String.raw`
+## Module 1 Recap
+
 Ab tak tumne ye concepts dekhe hain:
 
 - Java program ka basic structure
@@ -552,7 +560,7 @@ Ab tak tumne ye concepts dekhe hain:
 
 Ab in sab ko combine karke apna pehla **mini build** banana hai.
 
-## Mission
+## Mini-Build Mission
 
 Ek console profile build karo.
 

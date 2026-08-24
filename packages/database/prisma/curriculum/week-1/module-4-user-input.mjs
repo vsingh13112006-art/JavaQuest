@@ -50,7 +50,7 @@ Aman
 
 Program user ke input ko variable me store karega.
 
-## Mental model
+## Mental Model
 
 ~~~text
 Keyboard
@@ -317,7 +317,7 @@ Hello Aman
 
 Yahan hum previous modules ka String concatenation style use kar rahe hain.
 
-Program ka flow:
+## Program Flow
 
 ~~~text
 Prompt
@@ -498,7 +498,7 @@ Output:
 21
 ~~~
 
-Important:
+## Choose the Right Method
 
 ~~~java
 String name = input.nextLine();
@@ -548,7 +548,7 @@ price ke andar:
 
 store hoga.
 
-Complete example:
+## Complete Example
 
 ~~~java
 Scanner input = new Scanner(System.in);
@@ -570,7 +570,7 @@ Output:
 2.5
 ~~~
 
-Simple mapping:
+## Scanner Method Map
 
 ~~~text
 nextLine()   → String
@@ -768,7 +768,7 @@ Output:
 20
 ~~~
 
-Complete flow:
+## Complete Flow
 
 ~~~java
 Scanner input = new Scanner(System.in);
@@ -1071,7 +1071,7 @@ double hours = input.nextDouble();
 
 Program har input ko correct type ke variable me store karta hai.
 
-Mental model:
+## Mental Model
 
 ~~~text
 Aman
@@ -1318,7 +1318,7 @@ Aman
 
 Unexpectedly name empty mil sakta hai.
 
-## Kyun?
+## Why Does This Happen?
 
 Jab user:
 
@@ -1351,7 +1351,7 @@ empty String
 ~~~
 
 
-Simple mental model:
+## Mental Model
 
 ~~~text
 User enters: 25 + Enter
@@ -1376,7 +1376,7 @@ consumes leftover newline
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
-Common fix:
+## The Fix
 
 ~~~java
 int age = input.nextInt();
@@ -1577,7 +1577,7 @@ validAge = false
 ~~~
 
 
-Range check:
+## Range Check
 
 ~~~java
 int score = input.nextInt();
@@ -1803,11 +1803,11 @@ Is module me tumne seekha:
 - input validation expressions
 
 
-Final mission:
+## Final Mission
 
 User se learner profile data lena.
 
-Required input:
+## Required Input
 
 ~~~text
 Name
@@ -1821,7 +1821,7 @@ Program calculate karega:
 weekly coding hours
 ~~~
 
-Formula:
+## Formula
 
 ~~~text
 dailyHours * 7
@@ -1843,7 +1843,7 @@ Is challenge me Module 2, 3 aur 4 sab combine honge.
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Quick recap:
+## Quick Recap
 
 Text:
 
@@ -1872,7 +1872,7 @@ input.nextLine();
 kabhi leftover newline consume karne ke liye required ho sakta hai.
 
 
-Programming flow:
+## Programming Flow
 
 ~~~text
 Input

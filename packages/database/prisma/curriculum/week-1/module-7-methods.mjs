@@ -56,7 +56,7 @@ Agar same logic baar-baar copy karoge, code:
 
 Methods reusable code blocks hote hain.
 
-Example idea:
+## Method Idea
 
 ~~~java
 static void greet() {
@@ -114,7 +114,7 @@ Call:
 showMessage();
 ~~~
 
-Important difference:
+## Definition vs Call
 
 ~~~text
 method definition
@@ -198,7 +198,7 @@ static void greet() {
 }
 ~~~
 
-Isko break karke dekho:
+## Method Breakdown
 
 ~~~text
 static
@@ -217,7 +217,7 @@ greet
 → method body
 ~~~
 
-Complete program:
+## Complete Program
 
 ~~~java
 public class Main {
@@ -238,11 +238,9 @@ Output:
 Hello!
 ~~~
 
-Important:
+## Important Structure Rule
 
-Method ko main method ke andar define nahi karte.
-
-Method class ke andar hota hai, lekin main ke bahar.
+> 💡 Method ko `main()` ke andar define nahi karte. Method **class ke andar**, lekin `main()` ke bahar hota hai.
 `,
             },
 
@@ -458,6 +456,8 @@ Hello Aman
 Hello Riya
 ~~~
 
+## Parameter vs Argument
+
 Method definition me:
 
 ~~~java
@@ -474,7 +474,7 @@ Method call me:
 
 argument hai.
 
-Simple mental model:
+## Mental Model
 
 ~~~text
 argument
@@ -649,6 +649,8 @@ Parameters comma se separate hote hain.
 String name
 int score
 ~~~
+
+## Argument Order Matters
 
 Call me arguments ka order match karna chahiye:
 
@@ -852,6 +854,8 @@ Output:
 30
 ~~~
 
+## Return Type
+
 Method header:
 
 ~~~java
@@ -859,6 +863,8 @@ static int add(...)
 ~~~
 
 Yahan int batata hai ki method int value return karega.
+
+## return Statement
 
 Inside:
 
@@ -869,7 +875,7 @@ return a + b;
 calculated value caller ko wapas bhejta hai.
 
 
-Mental model:
+## Mental Model
 
 ~~~text
 10, 20
@@ -1052,7 +1058,7 @@ valid nahi hoga.
 Kyunki method int return nahi karta.
 
 
-Value-returning method:
+## Value-Returning Method
 
 ~~~java
 static int doubleNumber(int number) {
@@ -1074,7 +1080,7 @@ int result = doubleNumber(5);
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Simple beginner rule:
+## Simple Beginner Rule
 
 Method sirf action kare:
 
@@ -1099,7 +1105,7 @@ convert
 to return value useful ho sakti hai.
 
 
-Examples:
+## Examples
 
 ~~~java
 static void showProfile() {
@@ -1631,7 +1637,7 @@ Expected output:
               kind: "RECAP",
               position: 1,
               content: String.raw`
-Common mistakes:
+## Common Method Mistakes
 
 
 ## Missing ()
@@ -1820,7 +1826,7 @@ better organized bhi bana sakte ho.
 
 Final mission me program ke tasks separate methods me divide karoge.
 
-Possible responsibilities:
+## Possible Responsibilities
 
 ~~~text
 calculateTotalXp()
@@ -1831,7 +1837,7 @@ showResult()
 ~~~
 
 
-Example flow:
+## Program Flow
 
 ~~~text
 main()
@@ -1865,7 +1871,7 @@ Implementation details separate methods me chale jate hain.
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Quick recap:
+## Quick Recap
 
 ~~~text
 method
@@ -1885,7 +1891,7 @@ return
 ~~~
 
 
-Powerful combinations:
+## Powerful Combinations
 
 ~~~text
 method + condition

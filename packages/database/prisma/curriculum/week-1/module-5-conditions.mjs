@@ -2,7 +2,7 @@ export const conditionsModule = {
   slug: "week-1-conditions",
   title: "Week 1 — Conditions",
   description:
-    "if, else, else if, logical conditions aur switch ke through Java programs ko decisions lena sikhao.",
+    "if, else, else if, logical conditions, switch aur simple ternary expressions ke through Java programs ko decisions lena sikhao.",
   position: 5,
 
   quests: {
@@ -51,7 +51,7 @@ score >= 50 ka result true hai.
 
 Isliye block run hoga.
 
-Output:
+### Output
 
 ~~~text
 Passed
@@ -73,7 +73,7 @@ Isliye if block skip ho jayega.
 
 Koi output nahi aayega.
 
-## Mental model
+## Mental Model
 
 ~~~text
 Condition
@@ -97,7 +97,7 @@ Condition
               content: String.raw`
 if ke andar direct boolean variable bhi use kar sakte ho.
 
-Example:
+## Example
 
 ~~~java
 boolean loggedIn = true;
@@ -109,7 +109,7 @@ if (loggedIn) {
 
 loggedIn true hai.
 
-Output:
+### Output
 
 ~~~text
 Welcome!
@@ -252,7 +252,7 @@ NO OUTPUT`,
               content: String.raw`
 if ke saath else use karke dono possibilities handle kar sakte ho.
 
-Example:
+## Example
 
 ~~~java
 int age = 20;
@@ -266,7 +266,7 @@ if (age >= 18) {
 
 age >= 18 true hai.
 
-Output:
+### Output
 
 ~~~text
 Adult
@@ -280,13 +280,13 @@ int age = 15;
 
 to condition false hoti.
 
-Output:
+### Output
 
 ~~~text
 Minor
 ~~~
 
-## Important
+## Important Rule
 
 if / else me exactly ek branch run hoti hai.
 
@@ -308,7 +308,7 @@ else block
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
-Example:
+## Example
 
 ~~~java
 boolean gameOver = false;
@@ -320,7 +320,7 @@ if (gameOver) {
 }
 ~~~
 
-Output:
+### Output
 
 ~~~text
 Keep Playing
@@ -339,6 +339,83 @@ if (balance >= 50) {
 ~~~
 
 Conditions program ka behaviour dynamically change karti hain.
+`,
+            },
+
+            {
+              slug: "ternary-operator-bonus",
+              title: "Bonus: Ternary Operator ? :",
+              kind: "EXAMPLE",
+              position: 5,
+              content: String.raw`
+Simple if / else ka ek short form Java me **ternary operator** hota hai.
+
+Syntax:
+
+~~~java
+condition ? valueIfTrue : valueIfFalse
+~~~
+
+## Example
+
+~~~java
+int age = 20;
+
+String result =
+    age >= 18 ? "Adult" : "Minor";
+
+System.out.println(result);
+~~~
+
+### Output
+
+~~~text
+Adult
+~~~
+
+Normal if / else version:
+
+~~~java
+String result;
+
+if (age >= 18) {
+    result = "Adult";
+} else {
+    result = "Minor";
+}
+~~~
+
+Dono same decision perform karte hain.
+
+## Mental Model
+
+~~~text
+condition
+   ↓
+ true  → left value
+ false → right value
+~~~
+
+## Example
+
+~~~java
+int score = 72;
+
+String status =
+    score >= 50 ? "Passed" : "Failed";
+~~~
+
+## Ternary Kab Use Karein?
+
+Ternary useful hai jab:
+
+- decision simple ho
+- sirf do values me se ek choose karni ho
+- expression readable rahe
+
+Long ya complicated decision ke liye normal if / else better hota hai.
+
+> 💡 Ternary if / else ko replace karne ka rule nahi hai. Ye simple two-way value selection ka concise option hai.
 `,
             },
           ],
@@ -415,6 +492,74 @@ Adult`,
                 ],
               },
             },
+
+            {
+              slug: "predict-ternary-result",
+              title: "Bonus: Predict the Ternary",
+              prompt: `Code dekho:
+
+int score = 45;
+
+String result =
+    score >= 50 ? "Passed" : "Failed";
+
+System.out.println(result);
+
+Output kya hoga?`,
+              kind: "OUTPUT_PREDICTION",
+              difficulty: "BEGINNER",
+              position: 6,
+              solution: "Failed",
+            },
+
+            {
+              slug: "build-ternary-status",
+              title: "Bonus: Build a Ternary Status",
+              prompt: `score ki value 80 hai.
+
+Ternary operator use karke status banao:
+
+score >= 50 ? "Passed" : "Failed"
+
+Expected output:
+
+Passed`,
+              kind: "CODE",
+              difficulty: "BEGINNER",
+              position: 7,
+
+              starterCode: `public class Main {
+  public static void main(String[] args) {
+    int score = 80;
+
+    // ternary operator se status banao
+
+
+    System.out.println(status);
+  }
+}`,
+
+              solution: `public class Main {
+  public static void main(String[] args) {
+    int score = 80;
+
+    String status =
+        score >= 50 ? "Passed" : "Failed";
+
+    System.out.println(status);
+  }
+}`,
+
+              testCases: {
+                create: [
+                  {
+                    position: 1,
+                    expectedOutput: "Passed",
+                    isHidden: false,
+                  },
+                ],
+              },
+            },
           ],
         },
       },
@@ -472,7 +617,7 @@ Second condition:
 85 >= 70 → true
 ~~~
 
-Output:
+### Output
 
 ~~~text
 B
@@ -508,7 +653,7 @@ if (score >= 50) {
 
 Java first branch run karega.
 
-Output:
+### Output
 
 ~~~text
 Passed
@@ -526,9 +671,9 @@ if (score >= 90) {
 }
 ~~~
 
-Rule:
+## Ordering Rule
 
-> More specific / higher threshold conditions pehle check karo.
+> 💡 More specific / higher-threshold conditions pehle check karo.
 `,
             },
 
@@ -538,7 +683,7 @@ Rule:
               kind: "EXAMPLE",
               position: 5,
               content: String.raw`
-Example:
+## Example
 
 ~~~java
 int score = 76;
@@ -561,7 +706,7 @@ if (score >= 90) {
 >= 75 → true
 ~~~
 
-Output:
+### Output
 
 ~~~text
 B
@@ -722,7 +867,7 @@ Excellent`,
               content: String.raw`
 Logical operators ab actual decisions me use honge.
 
-Example:
+## Example
 
 ~~~java
 int age = 20;
@@ -732,6 +877,8 @@ if (age >= 18 && hasTicket) {
     System.out.println("Enter");
 }
 ~~~
+
+## AND Rule
 
 Dono conditions true honi chahiye:
 
@@ -753,7 +900,7 @@ if block run nahi karega.
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
-OR:
+## OR (`||`)
 
 ~~~java
 boolean premium = false;
@@ -766,13 +913,13 @@ if (premium || hasCoupon) {
 
 At least ek true hai.
 
-Output:
+### Output
 
 ~~~text
 Discount
 ~~~
 
-NOT:
+## NOT (`!`)
 
 ~~~java
 boolean banned = false;
@@ -784,7 +931,7 @@ if (!banned) {
 
 !false = true
 
-Output:
+### Output
 
 ~~~text
 Access allowed
@@ -924,7 +1071,7 @@ Discount`,
               content: String.raw`
 Ek if block ke andar dusra if ho sakta hai.
 
-Example:
+## Example
 
 ~~~java
 boolean loggedIn = true;
@@ -976,7 +1123,7 @@ Beginner stage par rule:
 
 Kai cases me logical operators cleaner ho sakte hain.
 
-Example:
+## Example
 
 ~~~java
 if (loggedIn && isAdmin) {
@@ -1092,7 +1239,7 @@ switch (choice) {
 
 choice = 2
 
-Output:
+### Output
 
 ~~~text
 Settings
@@ -1113,7 +1260,7 @@ switch useful hai jab:
 - ek value hai
 - multiple exact choices hain
 
-Example:
+## Example
 
 ~~~java
 switch (day) {
@@ -1233,7 +1380,7 @@ Exit`,
               kind: "RECAP",
               position: 1,
               content: String.raw`
-Common bugs recap:
+## Common Condition Bugs
 
 ## = vs ==
 
@@ -1411,7 +1558,7 @@ Current condition order wrong hai.`,
               content: String.raw`
 Ab tum programs ko actual decisions lena sikha sakte ho.
 
-Final mission:
+## Final Mission
 
 User score enter karega.
 
@@ -1422,7 +1569,7 @@ Program:
 3. grade decide karega
 
 
-Rules:
+## Rules
 
 ~~~text
 90 - 100 → A
@@ -1455,7 +1602,7 @@ Ye challenge combine karta hai:
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Quick recap:
+## Quick Recap
 
 ~~~text
 if
@@ -1478,11 +1625,12 @@ else if
 
 switch
 → exact fixed choices
+
+? :
+→ simple two-way value selection
 ~~~
 
-Remember:
-
-First matching else-if branch wins.
+> 💡 **Remember:** First matching `else if` branch wins.
 `,
             },
           ],

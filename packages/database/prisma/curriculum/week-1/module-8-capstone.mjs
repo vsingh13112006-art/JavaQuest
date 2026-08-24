@@ -48,7 +48,7 @@ Ab tak tum use kar chuke ho:
 - return values
 
 
-Ab final mission hai:
+## Final Mission
 
 # Java XP Tracker
 
@@ -86,7 +86,7 @@ Ye Week 1 ka final build hai.
 
 Isme goal sirf expected output produce karna nahi hai.
 
-Goal hai previous concepts ko ek real program me combine karna.
+> 💡 Goal sirf output banana nahi — Week 1 ke concepts ko ek real program me connect karna hai.
 `,
             },
 
@@ -109,7 +109,7 @@ completed sessions
 ~~~
 
 
-Example input:
+## Example Input
 
 ~~~text
 Aman
@@ -119,14 +119,14 @@ Aman
 ~~~
 
 
-XP calculation:
+## XP Calculation
 
 ~~~text
 80 + 30 = 110
 ~~~
 
 
-Level rules:
+## Level Rules
 
 ~~~text
 XP >= 200
@@ -140,7 +140,7 @@ otherwise
 ~~~
 
 
-Sessions:
+## Session Output
 
 ~~~text
 Session 1 complete
@@ -149,7 +149,7 @@ Session 3 complete
 ~~~
 
 
-Final report:
+## Final Report
 
 ~~~text
 === JAVA XP TRACKER ===
@@ -238,7 +238,7 @@ Har interactive program ko data kahin se milta hai.
 
 Hamare Java XP Tracker me data user enter karega.
 
-Scanner setup:
+## Scanner Setup
 
 ~~~java
 import java.util.Scanner;
@@ -247,21 +247,21 @@ Scanner input = new Scanner(System.in);
 ~~~
 
 
-Naam:
+## Read the Learner Name
 
 ~~~java
 String name = input.nextLine();
 ~~~
 
 
-Current XP:
+## Read Current XP
 
 ~~~java
 int currentXp = input.nextInt();
 ~~~
 
 
-Example input:
+## Example Input
 
 ~~~text
 Aman
@@ -269,7 +269,7 @@ Aman
 ~~~
 
 
-Variables:
+## Stored Values
 
 ~~~text
 name = "Aman"
@@ -290,24 +290,26 @@ Ab project ke paas learner ki initial state aa gayi.
               content: String.raw`
 Capstone me bhi data types matter karte hain.
 
-Learner name:
+## Learner Name
 
 ~~~java
 String name
 ~~~
 
-XP:
+## XP Values
 
 ~~~java
 int currentXp
 ~~~
 
-Sessions:
+## Sessions
 
 ~~~java
 int sessions
 ~~~
 
+
+## Type-Selection Question
 
 Question hamesha ye hona chahiye:
 
@@ -460,14 +462,14 @@ earned XP = 30
 ~~~
 
 
-Updated XP:
+## Updated XP
 
 ~~~text
 80 + 30 = 110
 ~~~
 
 
-Java:
+## Java Version
 
 ~~~java
 int currentXp = 80;
@@ -507,6 +509,8 @@ totalXp ab learner ki updated state represent karta hai.
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
+## Extract the Calculation into a Method
+
 Same calculation ko method me bhi organize kar sakte hain:
 
 ~~~java
@@ -737,7 +741,7 @@ if (xp >= 200) {
 
 xp = 110
 
-Check:
+## Condition Trace
 
 ~~~text
 110 >= 200
@@ -748,16 +752,14 @@ true
 ~~~
 
 
-Result:
+## Result
 
 ~~~text
 Level 2
 ~~~
 
 
-Condition order important hai.
-
-Higher XP threshold pehle check hoga.
+> 💡 **Condition order matters:** higher XP threshold ko pehle check karo.
 `,
             },
 
@@ -767,6 +769,8 @@ Higher XP threshold pehle check hoga.
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
+## Extract Level Logic into a Method
+
 Level calculation reusable method ban sakti hai:
 
 ~~~java
@@ -790,7 +794,7 @@ int level = calculateLevel(110);
 ~~~
 
 
-Result:
+## Result
 
 ~~~text
 2
@@ -983,6 +987,8 @@ Session 3 complete
 ~~~
 
 
+## Make It Dynamic
+
 Lekin sessions user input se aayenge.
 
 Isliye loop better hai:
@@ -1022,6 +1028,8 @@ Ye dynamic repetition hai.
               kind: "EXAMPLE",
               position: 3,
               content: String.raw`
+## Extract the Loop into a Method
+
 Loop logic ko reusable method me rakh sakte hain:
 
 ~~~java
@@ -1219,7 +1227,7 @@ Session 2 complete`,
               content: String.raw`
 Without methods, main() quickly large ho sakta hai.
 
-Better approach:
+## Better Method-Based Structure
 
 ~~~java
 int totalXp =
@@ -1249,7 +1257,7 @@ Print Sessions
 Implementation separate methods me hai.
 
 
-Possible project methods:
+## Project Methods
 
 ~~~java
 calculateTotalXp()
@@ -1272,7 +1280,7 @@ Isse code easier to read aur maintain hota hai.
               kind: "RECAP",
               position: 3,
               content: String.raw`
-Useful method design:
+## One Method, One Responsibility
 
 ~~~text
 calculateTotalXp
@@ -1289,10 +1297,10 @@ showReport
 ~~~
 
 
-Method ka naam padhkar task samajh aana chahiye.
+> 💡 Method ka naam padhkar uska task samajh aana chahiye.
 
 
-Avoid:
+## Avoid Vague Method Names
 
 ~~~text
 doEverything()
@@ -1485,7 +1493,7 @@ Level: 2`,
 Jab ek program me multiple bugs hon,
 sab kuch ek saath fix karne ki koshish mat karo.
 
-Structured debugging approach:
+## Structured Debugging Checklist
 
 ~~~text
 1. Compiler errors dekho
@@ -1506,7 +1514,7 @@ Structured debugging approach:
 ~~~
 
 
-Example bugs:
+## Example Bugs
 
 ~~~java
 String name = input.nextInt();
@@ -1849,7 +1857,7 @@ sessions
 ~~~
 
 
-Example input:
+## Example Input
 
 ~~~text
 Aman
@@ -1867,7 +1875,7 @@ currentXp + earnedXp
 ~~~
 
 
-Level rules:
+## Level Rules
 
 ~~~text
 >= 200

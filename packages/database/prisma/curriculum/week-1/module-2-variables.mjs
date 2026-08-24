@@ -656,10 +656,12 @@ Do lines me answer socho.`,
               content: String.raw`
 Abhi tak humne numbers store kiye:
 
+~~~java
 int age = 20;
 double price = 99.99;
+~~~
 
-Lekin real programs me hume text bhi store karna hota hai.
+Lekin real programs me hume **text** bhi store karna hota hai.
 
 Jaise:
 
@@ -668,57 +670,68 @@ Jaise:
 - programming language
 - course ka title
 
-Java me text store karne ke liye String use hota hai.
+Java me text store karne ke liye **String** use hota hai.
 
+## Your First String
 
-YOUR FIRST STRING
-
+~~~java
 String name = "Aman";
+~~~
 
-Is line ko simple way me samjho:
+Is line ko break karke dekho:
 
-String = data type
-name = variable ka naam
-"Aman" = variable ke andar stored value
+~~~text
+String      name      =      "Aman";
+  ↓           ↓                 ↓
+type         name              value
+~~~
 
-Text ke around double quotes use hue hain.
+- **String** data type hai.
+- **name** variable ka naam hai.
+- **"Aman"** stored text value hai.
+- Text ke around **double quotes** use hote hain.
 
+## String Ko Print Karna
 
-STRING KO PRINT KARNA
-
+~~~java
 String language = "Java";
 
 System.out.println(language);
+~~~
 
 Output:
 
+~~~text
 Java
+~~~
 
+## Variable Ki Value Change Karna
 
-VARIABLE KI VALUE CHANGE KARNA
-
+~~~java
 String language = "Java";
 
 language = "Python";
 
 System.out.println(language);
+~~~
 
 Output:
 
+~~~text
 Python
+~~~
 
+## Quick Examples
 
-YAAD RAKHO
-
-Text store karna ho -> String
-
-Example:
-
+~~~java
 String name = "Aman";
 String city = "Delhi";
 String language = "Java";
+~~~
 
-String values ke around double quotes use hote hain.
+> 💡 **Simple rule:**  
+> Text store karna ho → **String** use karo.  
+> String values ke around **double quotes** lagte hain.
 `,
             },
 
@@ -730,97 +743,100 @@ String values ke around double quotes use hote hain.
               content: String.raw`
 String ka use hum text store karne ke liye karte hain.
 
-Lekin kabhi-kabhi hume sirf ek single character store karna hota hai.
+Lekin kabhi-kabhi hume sirf **ek single character** store karna hota hai.
 
-Us situation me Java ka char data type useful hota hai.
+Us situation me Java ka **char** data type useful hota hai.
 
+## First char
 
-EXAMPLE
-
+~~~java
 char grade = 'A';
+~~~
 
 Aur examples:
 
+~~~java
 char section = 'B';
 char symbol = '#';
 char answer = 'Y';
+~~~
 
+## String aur char Ka Difference
 
-STRING AUR CHAR KA DIFFERENCE
-
+~~~java
 String language = "Java";
-
 char grade = 'A';
+~~~
 
+Mental model:
 
-String me text ho sakta hai:
+~~~text
+String → text
+char   → one character
+~~~
 
-String name = "Aman";
-
-char me ek single character hota hai:
-
-char grade = 'A';
-
-
-QUOTES PAR DHYAN DO
+## Quotes Par Dhyan Do
 
 String:
 
+~~~java
 String language = "Java";
+~~~
 
 Double quotes use karta hai.
 
-
 char:
 
+~~~java
 char letter = 'J';
+~~~
 
 Single quotes use karta hai.
 
+## Ek Character Bhi String Ho Sakta Hai
 
-YE BHI STRING HAI
-
+~~~java
 String letter = "J";
+~~~
 
-Kyunki "J" double quotes ke andar hai.
+Ye **String** hai because `"J"` double quotes ke andar hai.
 
+Lekin:
 
-LEKIN YE CHAR HAI
-
+~~~java
 char letter = 'J';
+~~~
 
+Ye **char** hai because `'J'` single quotes me hai.
 
-IMPORTANT
+## Quick Check
 
-"Java" -> String
+~~~text
+"Java" → String
+"J"    → String
+'J'    → char
+'A'    → char
+~~~
 
-"J" -> String
+## char Me Poora Word?
 
-'J' -> char
+Ye invalid hai:
 
-'A' -> char
-
-
-KYA CHAR ME POORA WORD STORE KAR SAKTE HAIN?
-
-Nahi.
-
-Ye wrong hai:
-
+~~~java
 char language = 'Java';
+~~~
 
-char ek single character ke liye hota hai.
+`char` sirf ek character ke liye hota hai.
 
-Correct version:
+Correct:
 
+~~~java
 String language = "Java";
+~~~
 
-
-SIMPLE RULE
-
-String = text
-
-char = one character
+> 💡 **Simple rule:**  
+> String = text  
+> char = one character
 `,
             },
 
@@ -830,92 +846,75 @@ char = one character
               kind: "THEORY",
               position: 5,
               content: String.raw`
-String aur char samajhte waqt quotes bahut important hain.
+String aur char samajhte waqt **quotes** bahut important hain.
 
 Correct code:
 
+~~~java
 String name = "Aman";
-
 char grade = 'A';
+~~~
 
+## Mistake 1 — String Me Single Quotes
 
-Ab kuch common mistakes dekhte hain.
+Wrong:
 
-
-MISTAKE 1
-
+~~~java
 String name = 'Aman';
-
-Ye wrong hai.
+~~~
 
 String value ke liye double quotes chahiye.
 
 Correct:
 
+~~~java
 String name = "Aman";
+~~~
 
+## Mistake 2 — char Me Double Quotes
 
-MISTAKE 2
+Wrong:
 
+~~~java
 char grade = "A";
+~~~
 
-Ye bhi wrong hai.
-
-"A" double quotes me hai, isliye ye String value hai.
+`"A"` double quotes me hai, isliye ye String value hai.
 
 Correct:
 
+~~~java
 char grade = 'A';
+~~~
 
+## Quick Check
 
-QUICK CHECK
+~~~text
+"Hello" → String
+"J"     → String
+'J'     → char
+~~~
 
-"Hello" -> String
+Sirf ek character likha hone ka matlab ye nahi ki wo automatically `char` hai.
 
-"J" -> String
+Quotes decide karte hain:
 
-'J' -> char
+~~~text
+Double quotes → String
+Single quotes → char
+~~~
 
+Lekin `char` ke andar sirf **ek character** hona chahiye.
 
-Ek important baat:
+~~~java
+String a = "A";
+char b = 'A';
+~~~
 
-Sirf ek character likha hone ka matlab ye nahi ki wo char hai.
+Dono visually similar lag sakte hain, lekin Java me **same type nahi hain**.
 
-Example:
-
-"J"
-
-Ye String hai because double quotes use hue hain.
-
-Lekin:
-
-'J'
-
-Ye char hai because single quotes use hue hain.
-
-
-MENTAL MODEL
-
-Double quotes -> String
-
-Single quotes -> char
-
-Lekin char ke andar sirf ek character hona chahiye.
-
-
-Java me:
-
-"A"
-
-aur
-
-'A'
-
-same type nahi hain.
-
-Pehla String hai.
-
-Dusra char hai.
+> 💡 **Yaad rakho:**  
+> `"A"` aur `'A'` ka type different hai.
 `,
             },
           ],
@@ -1089,64 +1088,63 @@ Kuch questions ka answer sirf do possibilities me hota hai.
 
 Jaise:
 
-Kya user logged in hai?
-Haan ya nahi.
+- Kya user logged in hai?
+- Kya course complete hua?
+- Kya game start hua?
 
-Kya course complete hua?
-Haan ya nahi.
+In sabka answer roughly **haan ya nahi** hota hai.
 
-Kya game start hua?
-Haan ya nahi.
+Java me aisi state ko **boolean** data type se represent karte hain.
 
-Java me aisi state ko boolean data type se represent kar sakte hain.
+## Basic Example
 
-Example:
-
+~~~java
 boolean isLoggedIn = true;
-
 boolean courseCompleted = false;
+~~~
 
+## boolean Ki Sirf Do Values
 
-BOOLEAN KI SIRF DO VALUES
-
+~~~text
 true
-
 false
-
+~~~
 
 Examples:
 
+~~~java
 boolean learningJava = true;
-
 boolean paymentSuccessful = false;
-
 boolean darkModeEnabled = true;
+~~~
 
+## Important — true vs "true"
 
-IMPORTANT
-
-true aur "true" same nahi hain.
+Ye dono same nahi hain.
 
 Correct:
 
+~~~java
 boolean learningJava = true;
+~~~
 
 Wrong:
 
+~~~java
 boolean learningJava = "true";
+~~~
 
-"true" double quotes ke andar hai, isliye wo text hai.
+`"true"` double quotes ke andar hai, isliye wo **String text** hai.
 
 Actual boolean value:
 
+~~~text
 true
+~~~
 
-
-SIMPLE RULE
-
-boolean = true ya false
-
-Quotes nahi lagane.
+> 💡 **Simple rule:**  
+> boolean = `true` ya `false`  
+> Quotes nahi lagane.
 `,
             },
 
@@ -1160,6 +1158,7 @@ Boolean bhi normal variable ki tarah update ho sakta hai.
 
 Example:
 
+~~~java
 boolean gameStarted = false;
 
 System.out.println(gameStarted);
@@ -1167,53 +1166,62 @@ System.out.println(gameStarted);
 gameStarted = true;
 
 System.out.println(gameStarted);
-
+~~~
 
 Output:
 
+~~~text
 false
 true
+~~~
 
+## Step by Step
 
-Step by step:
+Starting state:
 
-Starting value:
-
+~~~text
 gameStarted = false
+~~~
 
-Phir game start hua:
+Game start hone ke baad:
 
+~~~text
 gameStarted = true
-
+~~~
 
 Variable same raha.
 
-Sirf uske andar stored state change hui.
-
+Sirf uske andar stored **state** change hui.
 
 Ek aur example:
 
+~~~java
 boolean courseCompleted = false;
 
 courseCompleted = true;
 
 System.out.println(courseCompleted);
-
+~~~
 
 Output:
 
+~~~text
 true
+~~~
 
-
-YAAD RAKHO
-
-Existing boolean ko update karte waqt dobara boolean likhne ki zarurat nahi.
+## Existing boolean Update Karna
 
 Correct:
 
+~~~java
 boolean isOnline = false;
 
 isOnline = true;
+~~~
+
+Dobara `boolean` likhne ki zarurat nahi.
+
+> 💡 Pehli baar declaration me type likho. Update ke waqt sirf variable ko new value assign karo.
 `,
             },
 
@@ -1225,48 +1233,51 @@ isOnline = true;
               content: String.raw`
 Boolean tab useful hota hai jab kisi cheez ki state do possibilities me represent ho sakti hai.
 
-Examples:
+## Common Examples
 
+~~~java
 boolean isOnline = true;
-
 boolean hasAccess = false;
-
 boolean canEdit = true;
-
 boolean courseCompleted = false;
+~~~
 
+## Boolean Variable Names
 
-VARIABLE NAMES
-
-Boolean variables ke names readable hone chahiye.
+Readable names code ko easy banate hain.
 
 Examples:
 
+~~~text
 isOnline
 hasAccess
 canEdit
 isLoggedIn
 courseCompleted
+~~~
 
+Naam dekhte hi roughly samajh aa raha hai ki variable kis **state** ko represent karta hai.
 
-Naam dekhte hi hume roughly samajh aa raha hai ki variable kis state ko represent karta hai.
+## Abhi Kya Focus Hai?
 
+Aage hum expressions bhi likhenge jo boolean result dete hain.
 
-ABHI KYA NAHI SEEKH RAHE
+Jaise:
 
-Aage Java me hum expressions bhi likhenge jo boolean result dete hain.
-
-Jaise age check karna, score compare karna, ya multiple conditions combine karna.
+~~~text
+age compare karna
+score compare karna
+multiple conditions combine karna
+~~~
 
 Lekin abhi focus simple hai:
 
-boolean variable banana
+- boolean variable banana
+- `true` / `false` store karna
+- value update karna
+- value print karna
 
-true/false store karna
-
-value update karna
-
-aur print karna.
+> 💡 Boolean ko program ki **yes/no state** ki tarah socho.
 `,
             },
           ],
@@ -1425,75 +1436,83 @@ Variables sirf values store nahi karte.
 
 Hum un values ko calculations me bhi use kar sakte hain.
 
-Example:
+## First Calculation
 
+~~~java
 int coins = 10;
 int bonus = 5;
 
 int total = coins + bonus;
 
 System.out.println(total);
-
+~~~
 
 Output:
 
+~~~text
 15
+~~~
 
+## Kya Hua?
 
-KYA HUA?
-
-coins ke andar 10 tha.
-
-bonus ke andar 5 tha.
-
-Java ne calculate kiya:
+~~~text
+coins = 10
+bonus = 5
 
 10 + 5
+   ↓
+  15
+   ↓
+total = 15
+~~~
 
-Result:
+Java ne variables ke andar stored values use karke calculation ki.
 
-15
+## Basic Operations
 
-Phir 15 ko total variable me store kar diya.
+### Addition
 
-
-BASIC OPERATIONS
-
-Addition:
-
+~~~java
 int total = a + b;
+~~~
 
-Subtraction:
+### Subtraction
 
+~~~java
 int remaining = a - b;
+~~~
 
-Multiplication:
+### Multiplication
 
+~~~java
 int result = a * b;
+~~~
 
-Division:
+### Division
 
+~~~java
 int result = a / b;
+~~~
 
+## Practical Example
 
-Example:
-
+~~~java
 int price = 20;
 int quantity = 3;
 
 int total = price * quantity;
 
 System.out.println(total);
-
+~~~
 
 Output:
 
+~~~text
 60
+~~~
 
-
-IMPORTANT
-
-Calculation ka result bhi ek variable me store kiya ja sakta hai.
+> 💡 **Important:**  
+> Calculation ka result bhi kisi variable me store kiya ja sakta hai.
 `,
             },
 
@@ -1507,71 +1526,80 @@ Existing variable ko calculation ke result se update bhi kar sakte ho.
 
 Example:
 
+~~~java
 int coins = 10;
 
 coins = coins + 5;
 
 System.out.println(coins);
-
+~~~
 
 Output:
 
+~~~text
 15
-
+~~~
 
 Ye line beginner ko thodi strange lag sakti hai:
 
+~~~java
 coins = coins + 5;
-
+~~~
 
 Isko mathematics equation ki tarah mat dekho.
 
-Java pehle right side calculate karta hai.
+Java pehle **right side** calculate karta hai.
+
+## Step by Step
 
 Current value:
 
+~~~text
 coins = 10
+~~~
 
 Right side:
 
+~~~text
 coins + 5
-
-means:
-
 10 + 5
+   ↓
+  15
+~~~
 
-Result:
+Ab result wapas `coins` me store hota hai:
 
-15
-
-Ab ye result wapas coins me store hota hai.
-
-New value:
-
+~~~text
 coins = 15
+~~~
 
+## Ek Aur Example
 
-Ek aur example:
-
+~~~java
 int score = 100;
 
 score = score - 20;
 
 System.out.println(score);
-
+~~~
 
 Output:
 
+~~~text
 80
+~~~
 
+## Mental Model
 
-MENTAL MODEL
-
+~~~text
 Old value
-   ↓
+    ↓
 Calculation
-   ↓
+    ↓
 New value
+~~~
+
+> 💡 Assignment me pehle right side evaluate hoti hai, phir result left-side variable me store hota hai.
 `,
             },
 
@@ -1583,63 +1611,76 @@ New value
               content: String.raw`
 Calculations me data type ka effect result par bhi padta hai.
 
-Example:
+## int Division
 
+~~~java
 int a = 5;
 int b = 2;
 
 System.out.println(a / b);
+~~~
 
+Tum mathematically expect kar sakte ho:
 
-Tum expect kar sakte ho:
-
+~~~text
 2.5
+~~~
 
 Lekin output hoga:
 
+~~~text
 2
+~~~
 
+## Kyun?
 
-KYUN?
+Dono variables `int` hain.
 
-Dono variables int hain.
+Java integer division me decimal part remove kar deta hai.
 
-Java int division me decimal part remove kar deta hai.
+~~~text
+5 / 2
+  ↓
+ 2
+~~~
 
+## Decimal Result Chahiye?
 
-Agar decimal result chahiye:
+`double` use karo:
 
+~~~java
 double a = 5.0;
 double b = 2.0;
 
 System.out.println(a / b);
-
+~~~
 
 Output:
 
+~~~text
 2.5
+~~~
 
+## Ek Aur Example
 
-Ek aur example:
-
+~~~java
 double price = 50.0;
 double discount = 10.0;
 
 double finalPrice = price - discount;
 
 System.out.println(finalPrice);
-
+~~~
 
 Output:
 
+~~~text
 40.0
+~~~
 
-
-SIMPLE RULE
-
-Whole-number calculations ke liye int useful hai.
-
-Decimal calculations ke liye double use karo jab decimal result important ho.
+> 💡 **Simple rule:**  
+> Whole-number calculations → `int` useful ho sakta hai.  
+> Decimal result important ho → `double` use karo.
 `,
             },
           ],
@@ -1882,53 +1923,58 @@ Expected output:
               content: String.raw`
 Kabhi Java ek numeric type ko automatically dusre type me convert kar sakta hai.
 
-Example:
+## int → double
 
+~~~java
 int score = 100;
 
 double finalScore = score;
 
 System.out.println(finalScore);
+~~~
 
 Output:
 
+~~~text
 100.0
+~~~
 
+## Kya Hua?
 
-KYA HUA?
+`score` ek `int` tha:
 
-score ek int tha:
-
+~~~text
 100
+~~~
 
-Lekin finalScore double hai.
+`finalScore` ek `double` hai.
 
-Java ne value ko automatically convert kar diya:
+Java ne automatically convert kiya:
 
-100 -> 100.0
+~~~text
+100 → 100.0
+~~~
 
+Ye conversion generally safe hai because `double` decimal values bhi handle kar sakta hai.
 
-Ye conversion safe hai because double decimal values bhi handle kar sakta hai.
+## Ek Aur Example
 
-
-Ek aur example:
-
+~~~java
 int coins = 50;
 
 double wallet = coins;
 
 System.out.println(wallet);
+~~~
 
 Output:
 
+~~~text
 50.0
+~~~
 
-
-SIMPLE RULE
-
-int -> double
-
-Java usually automatically kar sakta hai.
+> 💡 **Simple rule:**  
+> `int → double` conversion Java usually automatically kar sakta hai.
 `,
             },
 
@@ -1940,52 +1986,59 @@ Java usually automatically kar sakta hai.
               content: String.raw`
 Reverse direction thodi different hai.
 
-Agar double value ko int me convert karna ho, to hume explicitly cast karna padta hai.
+Agar `double` value ko `int` me convert karna ho, to hume explicitly **cast** karna padta hai.
 
-Example:
+## Example
 
+~~~java
 double price = 99.99;
 
 int wholePrice = (int) price;
 
 System.out.println(wholePrice);
+~~~
 
 Output:
 
+~~~text
 99
+~~~
 
+## Important
 
-IMPORTANT
-
-Java 99.99 ko round karke 100 nahi bana raha.
+Java `99.99` ko round karke `100` nahi bana raha.
 
 Decimal part remove ho raha hai.
 
-Examples:
+~~~text
+99.99 → 99
+5.8   → 5
+2.1   → 2
+~~~
 
-99.99 -> 99
+## Casting Syntax
 
-5.8 -> 5
-
-2.1 -> 2
-
-
-CASTING SYNTAX
-
+~~~text
 (int) value
-
+~~~
 
 Example:
 
+~~~java
 double score = 87.9;
 
 int wholeScore = (int) score;
 
 System.out.println(wholeScore);
+~~~
 
 Output:
 
+~~~text
 87
+~~~
+
+> 💡 `double → int` karte waqt decimal part lose ho sakta hai.
 `,
             },
 
@@ -1997,50 +2050,50 @@ Output:
               content: String.raw`
 Har conversion equally safe nahi hoti.
 
-Example:
+## Safe Direction Example
 
+~~~java
 int number = 25;
 
 double converted = number;
+~~~
 
-Yahan information lose nahi hoti.
+Yahan information lose nahi hoti:
 
-25 -> 25.0
+~~~text
+25 → 25.0
+~~~
 
+## Possible Data Loss
 
-Lekin:
-
+~~~java
 double number = 25.75;
 
 int converted = (int) number;
+~~~
 
-Yahan decimal information lose ho jati hai.
+Yahan decimal information lose ho jati hai:
 
-25.75 -> 25
-
+~~~text
+25.75 → 25
+~~~
 
 Isliye casting ko blindly use nahi karna chahiye.
 
 Cast tab karo jab tum consciously accept kar rahe ho ki value ka kuch part lose ho sakta hai.
 
+## Mental Model
 
-MENTAL MODEL
-
-int -> double
-
+~~~text
+int → double
 Usually safe
 
-
-double -> int
-
+double → int
 Possible data loss
+~~~
 
-
-YAAD RAKHO
-
-Casting ka purpose compiler ko bas chup karana nahi hai.
-
-Tumhe samajhna chahiye conversion ke baad actual value kya banegi.
+> 💡 Casting ka purpose compiler ko bas chup karana nahi hai.  
+> Conversion ke baad actual value kya banegi, ye samajhna zaroori hai.
 `,
             },
           ],
@@ -2234,48 +2287,61 @@ Normal variable ki value change ho sakti hai.
 
 Example:
 
+~~~java
 int maxLives = 3;
 
 maxLives = 10;
+~~~
 
 Java ise allow karega.
 
+Lekin kuch values program ke **fixed rules** represent karti hain aur unhe change nahi hona chahiye.
 
-Lekin kuch values program ke rules represent karti hain aur unhe change nahi hona chahiye.
+## final Constant
 
-Example:
-
+~~~java
 final int MAX_LIVES = 3;
-
+~~~
 
 Ab agar hum likhen:
 
+~~~java
 MAX_LIVES = 10;
+~~~
 
 to Java compile error dega.
 
+## final Ka Matlab
 
-final KA MATLAB
-
-final lagane ke baad variable ko dobara assign nahi kar sakte.
-
+`final` lagane ke baad variable ko dobara assign nahi kar sakte.
 
 Example:
 
+~~~java
 final int MAX_LEVEL = 100;
 
 System.out.println(MAX_LEVEL);
+~~~
 
 Output:
 
+~~~text
 100
+~~~
 
+## Mental Model
 
-SIMPLE RULE
+~~~text
+Normal variable
+→ value change ho sakti hai
 
-Normal variable -> change ho sakta hai
+final variable
+→ once assigned
+→ reassign nahi kar sakte
+~~~
 
-final variable -> once assigned, dobara change nahi
+> 💡 **Simple rule:**  
+> Fixed rule/value ke liye `final` useful hai.
 `,
             },
 
@@ -2285,46 +2351,44 @@ final variable -> once assigned, dobara change nahi
               kind: "THEORY",
               position: 3,
               content: String.raw`
-Java me constants ke liye commonly uppercase naming convention use hoti hai.
+Java me constants ke liye commonly **UPPER_SNAKE_CASE** naming convention use hoti hai.
 
-Examples:
+## Examples
 
+~~~java
 final int MAX_USERS = 100;
-
 final double PI = 3.14159;
-
 final String APP_NAME = "JavaQuets";
+~~~
 
+Multiple words ke beech underscore use hota hai:
 
-Multiple words ke beech underscore use hota hai.
-
-Examples:
-
+~~~text
 MAX_USERS
-
 MAX_LEVEL
-
 DAYS_IN_WEEK
-
 APP_NAME
+~~~
 
+## Important
 
-IMPORTANT
-
-UPPER_SNAKE_CASE compiler ki requirement nahi hai.
-
-Ye ek common readability convention hai.
-
+`UPPER_SNAKE_CASE` compiler ki requirement nahi hai.
 
 Java technically ye bhi allow karega:
 
+~~~java
 final int maxUsers = 100;
+~~~
 
 Lekin constants ke liye commonly:
 
+~~~java
 final int MAX_USERS = 100;
+~~~
 
 zyada readable convention hai.
+
+> 💡 Convention code ko readable aur consistent banati hai.
 `,
             },
 
@@ -2338,41 +2402,43 @@ Normal variable aur constant ka purpose different ho sakta hai.
 
 Example:
 
+~~~java
 int score = 10;
 
 final int MAX_SCORE = 100;
+~~~
 
-
-score player ki current state represent kar raha hai.
+`score` player ki current state represent kar raha hai.
 
 Ye change ho sakta hai:
 
+~~~java
 score = 20;
+~~~
 
+`MAX_SCORE` game ka fixed rule represent kar raha hai.
 
-MAX_SCORE game ka fixed rule represent kar raha hai.
+Isliye ise reassign nahi karna chahiye.
 
-Isliye:
+## Real Examples
 
-MAX_SCORE = 200;
-
-allow nahi hona chahiye.
-
-
-REAL EXAMPLES
-
+~~~java
 final int DAYS_IN_WEEK = 7;
-
 final String COURSE_NAME = "JavaQuets";
-
 final int MAX_ATTEMPTS = 3;
+~~~
 
+## Mental Model
 
-MENTAL MODEL
+~~~text
+Current state
+→ normal variable
 
-Current state -> normal variable
+Fixed rule / fixed value
+→ final constant
+~~~
 
-Fixed rule/value -> final constant
+> 💡 Har value ko constant mat banao. `final` tab use karo jab value logically fixed rehni chahiye.
 `,
             },
           ],
@@ -2555,70 +2621,55 @@ Exactly keyword enter karo.`,
               content: String.raw`
 Module 2 me tumne kaafi important building blocks seekhe hain.
 
-Ab tak tum jaante ho:
+## Ab Tak Tum Jaante Ho
 
+~~~text
 int
-
 double
-
 String
-
 char
-
 boolean
-
 variable updates
-
 basic calculations
-
 type conversion
-
 casting
-
 final constants
+~~~
 
+Ab time hai in concepts ko combine karne ka.
 
-Ab time hai sab concepts ko combine karne ka.
-
-
-MISSION
+# Mission — Java Learner Profile
 
 Ek Java Learner Profile build karna hai.
 
 Profile me different data types use honge.
 
-
 Required values:
 
+~~~text
 name = "Aman"
-
 level = 3
-
 progress = 72.5
-
 grade = 'A'
-
 learningJava = true
-
 MAX_LEVEL = 100
-
+~~~
 
 Tumhe har value ke liye correct data type choose karna hoga.
 
-
-GOAL
+## Goal
 
 Sirf syntax copy nahi karna.
 
 Ye prove karna hai ki tum samajhte ho:
 
-kis value ke liye kaunsa type use hota hai
+- kis value ke liye kaunsa type use hota hai
+- variable kaise create hota hai
+- constant kaise create hota hai
+- values kaise print hoti hain
+- existing value kaise update hoti hai
 
-variable kaise create hota hai
-
-constant kaise create hota hai
-
-aur values kaise print hoti hain.
+> 💡 Final challenge me Module 2 ke concepts ek saath use honge.
 `,
             },
 
@@ -2630,10 +2681,11 @@ aur values kaise print hoti hain.
               content: String.raw`
 Real programming me tum hamesha blank file se code nahi likhoge.
 
-Kabhi tumhe broken code bhi milega.
+Kabhi tumhe **broken code** bhi milega.
 
 Example:
 
+~~~java
 String name = 'Aman';
 
 int progress = 72.5;
@@ -2641,34 +2693,79 @@ int progress = 72.5;
 char grade = "A";
 
 boolean learningJava = "true";
-
+~~~
 
 Is code me multiple type mistakes hain.
 
+## Bug 1 — String Quotes
 
-Correct thinking:
+Wrong:
 
-name text hai -> String + double quotes
+~~~java
+String name = 'Aman';
+~~~
 
-progress decimal hai -> double
+Correct:
 
-grade single character hai -> char + single quotes
-
-learningJava state hai -> boolean true/false
-
-
-Correct versions:
-
+~~~java
 String name = "Aman";
+~~~
 
+## Bug 2 — Decimal in int
+
+Wrong:
+
+~~~java
+int progress = 72.5;
+~~~
+
+Correct:
+
+~~~java
 double progress = 72.5;
+~~~
 
+## Bug 3 — char Quotes
+
+Wrong:
+
+~~~java
+char grade = "A";
+~~~
+
+Correct:
+
+~~~java
 char grade = 'A';
+~~~
 
+## Bug 4 — boolean as Text
+
+Wrong:
+
+~~~java
+boolean learningJava = "true";
+~~~
+
+Correct:
+
+~~~java
 boolean learningJava = true;
+~~~
 
+## Debugging Checklist
 
-Debugging bhi programming ka core skill hai.
+~~~text
+Value kya represent karti hai?
+        ↓
+Correct data type kaunsa hai?
+        ↓
+Quotes correct hain?
+        ↓
+Assignment valid hai?
+~~~
+
+> 💡 Debugging bhi programming ka core skill hai.
 `,
             },
           ],

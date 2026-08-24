@@ -32,15 +32,14 @@ Java sirf values store nahi karta.
 
 Hum Java ko calculations karne ke liye bhi use kar sakte hain.
 
-Basic arithmetic operators:
+## Basic Arithmetic Operators
 
-+  Addition
-
--  Subtraction
-
-*  Multiplication
-
-/  Division
+~~~text
++   Addition
+-   Subtraction
+*   Multiplication
+/   Division
+~~~
 
 
 ## Addition
@@ -144,7 +143,7 @@ int finalScore = startingScore + bonus - penalty;
 System.out.println(finalScore);
 ~~~
 
-Calculation:
+## Calculation
 
 ~~~text
 100 + 30 - 10
@@ -550,7 +549,7 @@ Result:
 ~~~
 
 
-Basic rule:
+## Precedence Rule
 
 ~~~text
 () first
@@ -749,15 +748,12 @@ score += 20;
 Dono ka effect same hai.
 
 
-Common assignment shortcuts:
+## Common Assignment Shortcuts
 
 ~~~text
 +=   add and assign
-
 -=   subtract and assign
-
 *=   multiply and assign
-
 /=   divide and assign
 ~~~
 
@@ -1195,19 +1191,14 @@ Output kya hoga?`,
               content: String.raw`
 Java me values compare karne ke liye comparison operators use hote hain.
 
-Common operators:
+## Common Comparison Operators
 
 ~~~text
 >    greater than
-
 <    less than
-
 >=   greater than or equal
-
 <=   less than or equal
-
 ==   equal to
-
 !=   not equal to
 ~~~
 
@@ -1614,7 +1605,7 @@ true
 ~~~
 
 
-OR truth pattern:
+## OR Truth Pattern
 
 ~~~text
 true  || true   → true
@@ -1659,7 +1650,7 @@ true
 ~~~
 
 
-Simple mental model:
+## Mental Model
 
 ~~~text
 !true  → false
