@@ -1,13 +1,8 @@
 "use client";
 
-import { LessonContent } from "@/components/lesson-content";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import type {
   ExerciseDto,
@@ -16,6 +11,9 @@ import type {
   SubmissionResultDto,
 } from "@javaquets/shared";
 
+import { LessonContent } from "@/components/lesson-content";
+import { ProgressBar } from "@/components/progress-bar";
+
 import {
   completeExercise,
   getQuestProgress,
@@ -23,7 +21,6 @@ import {
 } from "@/services/learner";
 
 import { submitJava } from "@/services/submissions";
-import { ProgressBar } from "@/components/progress-bar";
 
 export function QuestWorkspace({
   quest,
@@ -37,22 +34,16 @@ export function QuestWorkspace({
   const items = useMemo(
     () => [
       ...[...quest.lessons]
-        .sort(
-          (a, b) =>
-            a.position - b.position,
-        )
-        .map((x) => ({
-          ...x,
+        .sort((a, b) => a.position - b.position)
+        .map((item) => ({
+          ...item,
           type: "lesson" as const,
         })),
 
       ...[...quest.exercises]
-        .sort(
-          (a, b) =>
-            a.position - b.position,
-        )
-        .map((x) => ({
-          ...x,
+        .sort((a, b) => a.position - b.position)
+        .map((item) => ({
+          ...item,
           type: "exercise" as const,
         })),
     ],
@@ -60,32 +51,17 @@ export function QuestWorkspace({
   );
 
   const [index, setIndex] = useState(0);
-
-  const [progress, setProgress] =
-    useState<QuestProgressDto | null>(
-      null,
-    );
+  const [progress, setProgress] = useState<QuestProgressDto | null>(null);
 
   const [code, setCode] = useState(
     quest.exercises[0]?.starterCode ?? "",
   );
 
-  const [answer, setAnswer] =
-    useState("");
-
-  const [result, setResult] =
-    useState<SubmissionResultDto | null>(
-      null,
-    );
-
-  const [busy, setBusy] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
-
-  const [answerCorrect, setAnswerCorrect] =
-    useState(false);
+  const [answer, setAnswer] = useState("");
+  const [result, setResult] = useState<SubmissionResultDto | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [answerCorrect, setAnswerCorrect] = useState(false);
 
   const current = items[index];
 
@@ -114,12 +90,8 @@ export function QuestWorkspace({
   // =====================================================
 
   useEffect(() => {
-    if (
-      current?.type === "exercise"
-    ) {
-      setCode(
-        current.starterCode ?? "",
-      );
+    if (current?.type === "exercise") {
+      setCode(current.starterCode ?? "");
     }
 
     setAnswer("");
@@ -132,64 +104,38 @@ export function QuestWorkspace({
   // EVALUATE EXERCISE
   // =====================================================
 
-  async function evaluate(
-    exercise: ExerciseDto,
-  ) {
+  async function evaluate(exercise: ExerciseDto) {
     setBusy(true);
     setError("");
 
     try {
-      // -----------------------------
-      // CODE EXERCISE
-      // -----------------------------
-
       if (exercise.kind === "CODE") {
-        const submission =
-          await submitJava(
-            quest.slug,
-            exercise.slug,
-            code,
-          );
+        const submission = await submitJava(
+          quest.slug,
+          exercise.slug,
+          code,
+        );
 
         setResult(submission);
 
-        // submitJava evaluator backend
-        // already handles CODE completion
-        // after passing.
-        if (
-          submission.status ===
-          "PASSED"
-        ) {
-          const updatedProgress =
-            await getQuestProgress(
-              quest.slug,
-            );
-
-          setProgress(
-            updatedProgress,
-          );
+        if (submission.status === "PASSED") {
+          const updatedProgress = await getQuestProgress(quest.slug);
+          setProgress(updatedProgress);
         }
 
         return;
       }
 
-      // -----------------------------
-      // NON-CODE EXERCISE
-      // -----------------------------
-
       if (!answer.trim()) {
-        setError(
-          "Enter an answer before checking.",
-        );
+        setError("Enter an answer before checking.");
         return;
       }
 
-      const updatedProgress =
-        await completeExercise(
-          quest.slug,
-          exercise.slug,
-          answer,
-        );
+      const updatedProgress = await completeExercise(
+        quest.slug,
+        exercise.slug,
+        answer,
+      );
 
       setProgress(updatedProgress);
       setAnswerCorrect(true);
@@ -211,119 +157,214 @@ export function QuestWorkspace({
   // =====================================================
 
   function goNext() {
-    const isLastItem =
-      index >= items.length - 1;
+    const isLastItem = index >= items.length - 1;
 
     if (!isLastItem) {
-      setIndex(index + 1);
+      setIndex((currentIndex) => currentIndex + 1);
       return;
     }
 
     if (nextQuestSlug) {
-      router.push(
-        `/quests/${nextQuestSlug}`,
-      );
-
+      router.push(`/quests/${nextQuestSlug}`);
       return;
     }
 
-    router.push(
-      `/courses/${quest.module.courseSlug}`,
-    );
+    router.push(`/courses/${quest.module.courseSlug}`);
   }
 
   // =====================================================
   // PROGRESS
   // =====================================================
 
-  const completed =
-    progress?.completedExercises ?? 0;
+  const completed = progress?.completedExercises ?? 0;
+
+  const totalExercises =
+    progress?.totalExercises ?? quest.exercises.length;
 
   const pct =
-    progress?.totalExercises
-      ? (completed /
-          progress.totalExercises) *
-        100
+    totalExercises > 0
+      ? (completed / totalExercises) * 100
+      : 0;
+
+  const itemProgress =
+    items.length > 0
+      ? Math.round(((index + 1) / items.length) * 100)
       : 0;
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-[1500px]">
       {/* =================================================
-          HEADER
+          TOP NAVIGATION
       ================================================= */}
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <Link
-            className="text-sm text-slate-400"
-            href={`/courses/${quest.module.courseSlug}`}
-          >
-            ← {quest.module.title}
-          </Link>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <Link
+          href={`/courses/${quest.module.courseSlug}`}
+          className="group inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-slate-100"
+        >
+          <span className="transition group-hover:-translate-x-0.5">
+            ←
+          </span>
 
-          <h1 className="mt-2 text-3xl font-black">
-            {quest.title}
-          </h1>
+          <span>{quest.module.title}</span>
+        </Link>
+
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <span>Item {Math.min(index + 1, items.length)}</span>
+          <span className="text-slate-700">/</span>
+          <span>{items.length}</span>
+        </div>
+      </div>
+
+      {/* =================================================
+          QUEST HEADER
+      ================================================= */}
+
+      <header className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 px-5 py-5 sm:px-7">
+        <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-amber-400/5 blur-3xl" />
+
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-300">
+                Quest
+              </span>
+
+              {progress?.status && (
+                <span className="rounded-full border border-slate-700 bg-slate-950/50 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                  {progress.status.replace(/_/g, " ")}
+                </span>
+              )}
+            </div>
+
+            <h1 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">
+              {quest.title}
+            </h1>
+
+            {quest.description && (
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+                {quest.description}
+              </p>
+            )}
+          </div>
+
+          <div className="w-full shrink-0 lg:w-72">
+            <div className="mb-2 flex items-center justify-between text-xs">
+              <span className="font-semibold text-slate-400">
+                Exercise progress
+              </span>
+
+              <span className="font-bold text-slate-200">
+                {completed}/{totalExercises}
+              </span>
+            </div>
+
+            <ProgressBar value={pct} />
+          </div>
+        </div>
+      </header>
+
+      {/* =================================================
+          MOBILE ITEM PROGRESS
+      ================================================= */}
+
+      <div className="mt-4 lg:hidden">
+        <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
+          <span>Quest path</span>
+          <span>{itemProgress}% explored</span>
         </div>
 
-        <div className="w-full sm:w-64">
-          <ProgressBar
-            value={pct}
-            label={`${completed}/${
-              progress?.totalExercises ??
-              quest.exercises.length
-            } exercises`}
+        <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div
+            className="h-full rounded-full bg-amber-400 transition-all duration-300"
+            style={{ width: `${itemProgress}%` }}
           />
         </div>
       </div>
 
       {/* =================================================
-          QUEST WORKSPACE
+          WORKSPACE
       ================================================= */}
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-[260px_1fr]">
+      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
         {/* ===============================================
             QUEST PATH
         =============================================== */}
 
-        <aside className="card h-fit">
-          <p className="eyebrow">
-            Quest path
-          </p>
+        <aside className="lg:sticky lg:top-24">
+          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60">
+            <div className="border-b border-slate-800 px-5 py-4">
+              <p className="eyebrow">Quest path</p>
 
-          <div className="mt-4 space-y-1">
-            {items.map((item, i) => {
-              const done =
-                item.type === "exercise" &&
-                progress?.completedExerciseSlugs.includes(
-                  item.slug,
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                Learn the concept, then prove it with practice.
+              </p>
+            </div>
+
+            <div className="max-h-[calc(100vh-250px)] overflow-y-auto p-2">
+              {items.map((item, itemIndex) => {
+                const isCurrent = itemIndex === index;
+
+                const done =
+                  item.type === "exercise" &&
+                  (progress?.completedExerciseSlugs.includes(
+                    item.slug,
+                  ) ??
+                    false);
+
+                const visitedLesson =
+                  item.type === "lesson" && itemIndex < index;
+
+                return (
+                  <button
+                    key={`${item.type}-${item.slug}`}
+                    type="button"
+                    onClick={() => setIndex(itemIndex)}
+                    className={`group flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition ${
+                      isCurrent
+                        ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-950/10"
+                        : "text-slate-300 hover:bg-slate-800/70"
+                    }`}
+                  >
+                    <span
+                      className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-black ${
+                        isCurrent
+                          ? "bg-slate-950/15 text-slate-950"
+                          : done
+                            ? "bg-emerald-950 text-emerald-300"
+                            : visitedLesson
+                              ? "bg-slate-800 text-slate-300"
+                              : "bg-slate-950 text-slate-500"
+                      }`}
+                    >
+                      {done
+                        ? "✓"
+                        : item.type === "lesson"
+                          ? "◆"
+                          : itemIndex + 1}
+                    </span>
+
+                    <span className="min-w-0">
+                      <span
+                        className={`block text-[10px] font-black uppercase tracking-[0.15em] ${
+                          isCurrent
+                            ? "text-slate-800/70"
+                            : "text-slate-600"
+                        }`}
+                      >
+                        {item.type === "lesson"
+                          ? "Learn"
+                          : "Practice"}
+                      </span>
+
+                      <span className="mt-0.5 block text-sm font-semibold leading-5">
+                        {item.title}
+                      </span>
+                    </span>
+                  </button>
                 );
-
-              return (
-                <button
-                  key={`${item.type}-${item.slug}`}
-                  onClick={() =>
-                    setIndex(i)
-                  }
-                  className={`w-full rounded-xl p-3 text-left text-sm ${
-                    i === index
-                      ? "bg-amber-400 font-bold text-slate-950"
-                      : "text-slate-300 hover:bg-slate-800"
-                  }`}
-                >
-                  <span className="mr-2">
-                    {done
-                      ? "✓"
-                      : item.type ===
-                          "lesson"
-                        ? "◆"
-                        : "›"}
-                  </span>
-
-                  {item.title}
-                </button>
-              );
-            })}
+              })}
+            </div>
           </div>
         </aside>
 
@@ -331,26 +372,24 @@ export function QuestWorkspace({
             CURRENT CONTENT
         =============================================== */}
 
-        <section>
-          {current?.type ===
-          "lesson" ? (
+        <main className="min-w-0">
+          {current?.type === "lesson" ? (
             <Lesson
               title={current.title}
               kind={current.kind}
               content={current.content}
+              currentIndex={index}
+              totalItems={items.length}
               onNext={goNext}
             />
-          ) : current?.type ===
-            "exercise" ? (
+          ) : current?.type === "exercise" ? (
             <Exercise
               exercise={current}
               code={code}
               setCode={setCode}
               answer={answer}
               setAnswer={setAnswer}
-              answerCorrect={
-                answerCorrect
-              }
+              answerCorrect={answerCorrect}
               result={result}
               busy={busy}
               error={error}
@@ -359,18 +398,13 @@ export function QuestWorkspace({
                   current.slug,
                 ) ?? false
               }
-              onRun={() =>
-                evaluate(current)
-              }
+              onRun={() => evaluate(current)}
               onNext={goNext}
             />
           ) : (
-            <div className="card">
-              This quest has no content
-              yet.
-            </div>
+            <EmptyQuest />
           )}
-        </section>
+        </main>
       </div>
     </div>
   );
@@ -384,35 +418,49 @@ function Lesson({
   title,
   kind,
   content,
+  currentIndex,
+  totalItems,
   onNext,
 }: {
   title: string;
   kind: string;
   content: string;
+  currentIndex: number;
+  totalItems: number;
   onNext: () => void;
 }) {
   return (
-    <article className="card min-h-[480px] p-8">
-      <p className="eyebrow">
-        {kind}
-      </p>
+    <article className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
+      <header className="border-b border-slate-800 px-6 py-6 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="eyebrow">{kind.replace(/_/g, " ")}</p>
 
-      <h2 className="mt-3 text-3xl font-black">
-        {title}
-      </h2>
+          <span className="text-xs font-semibold text-slate-500">
+            {currentIndex + 1} of {totalItems}
+          </span>
+        </div>
 
-      <div className="mt-8">
-        <LessonContent
-          content={content}
-        />
+        <h2 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">
+          {title}
+        </h2>
+      </header>
+
+      <div className="px-6 py-7 sm:px-8 sm:py-9">
+        <div className="mx-auto max-w-4xl">
+          <LessonContent content={content} />
+        </div>
+
+        <div className="mx-auto mt-10 flex max-w-4xl justify-end border-t border-slate-800 pt-6">
+          <button
+            type="button"
+            className="btn-primary min-w-36"
+            onClick={onNext}
+          >
+            Continue
+            <span className="ml-2">→</span>
+          </button>
+        </div>
       </div>
-
-      <button
-        className="btn-primary mt-12"
-        onClick={onNext}
-      >
-        Continue →
-      </button>
     </article>
   );
 }
@@ -436,139 +484,118 @@ function Exercise({
   onNext,
 }: {
   exercise: ExerciseDto;
-
   code: string;
-
   setCode: (value: string) => void;
-
   answer: string;
-
-  setAnswer: (
-    value: string,
-  ) => void;
-
+  setAnswer: (value: string) => void;
   answerCorrect: boolean;
-
-  result:
-    | SubmissionResultDto
-    | null;
-
+  result: SubmissionResultDto | null;
   busy: boolean;
-
   error: string;
-
   completed: boolean;
-
   onRun: () => void;
-
   onNext: () => void;
 }) {
-  const passed =
-    result?.status === "PASSED";
-
-  const isCode =
-    exercise.kind === "CODE";
-
-  const isPrediction =
-    exercise.kind ===
-    "OUTPUT_PREDICTION";
-
-  const isMultipleChoice =
-    exercise.kind ===
-    "MULTIPLE_CHOICE";
+  const passed = result?.status === "PASSED";
+  const isCode = exercise.kind === "CODE";
+  const isPrediction = exercise.kind === "OUTPUT_PREDICTION";
+  const isMultipleChoice = exercise.kind === "MULTIPLE_CHOICE";
 
   return (
     <div className="space-y-4">
       {/* ===============================================
-          EXERCISE PROMPT
+          CHALLENGE HEADER
       =============================================== */}
 
-      <article className="card">
-        <p className="eyebrow">
-          {exercise.kind.replace(
-            /_/g,
-            " ",
-          )}{" "}
-          exercise
-        </p>
+      <article className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
+        <div className="border-b border-slate-800 px-6 py-5 sm:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.17em] text-amber-300">
+              {exercise.kind.replace(/_/g, " ")}
+            </span>
 
-        <h2 className="mt-3 text-2xl font-black">
-          {exercise.title}
-        </h2>
+            {completed && (
+              <span className="rounded-full border border-emerald-800 bg-emerald-950/40 px-3 py-1 text-xs font-bold text-emerald-300">
+                ✓ Completed
+              </span>
+            )}
+          </div>
 
-        <div className="mt-3 whitespace-pre-wrap leading-7 text-slate-300">
-          {exercise.prompt}
+          <h2 className="mt-4 text-2xl font-black tracking-tight text-white sm:text-3xl">
+            {exercise.title}
+          </h2>
+        </div>
+
+        <div className="px-6 py-6 sm:px-8">
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+            Challenge
+          </p>
+
+          <div className="whitespace-pre-wrap text-[15px] leading-7 text-slate-300">
+            {exercise.prompt}
+          </div>
         </div>
       </article>
 
       {/* ===============================================
-          CODE EXERCISE
+          CODE WORKSPACE
       =============================================== */}
 
       {isCode && (
-        <>
-          <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#050914]">
-            <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-              <span className="text-sm font-semibold text-slate-300">
-                Main.java
-              </span>
+        <section className="overflow-hidden rounded-3xl border border-slate-800 bg-[#050914] shadow-2xl shadow-black/10">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/50 px-5 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-1.5" aria-hidden="true">
+                <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+                <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+              </div>
 
-              <span className="text-xs text-slate-500">
-                Java 21
+              <span className="border-l border-slate-700 pl-3 text-xs font-bold text-slate-300">
+                Main.java
               </span>
             </div>
 
-            <textarea
-              aria-label="Java source code"
-              spellCheck={false}
-              value={code}
-              onChange={(e) =>
-                setCode(
-                  e.target.value,
-                )
-              }
-              className="min-h-[330px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-6 text-slate-100 outline-none"
-            />
+            <span className="rounded-md bg-slate-950 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              Java 21
+            </span>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button
-              className="btn-secondary"
-              disabled={
-                busy ||
-                !code.trim()
-              }
-              onClick={onRun}
-            >
-              {busy
-                ? "Running…"
-                : "Run tests"}
-            </button>
+          <textarea
+            aria-label="Java source code"
+            spellCheck={false}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            className="min-h-[390px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-7 text-slate-100 outline-none sm:p-6"
+          />
 
-            <button
-              className="btn-primary"
-              disabled={
-                busy ||
-                !code.trim()
-              }
-              onClick={onRun}
-            >
-              {busy
-                ? "Submitting…"
-                : "Submit solution"}
-            </button>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 bg-slate-900/40 px-5 py-4">
+            <p className="text-xs text-slate-500">
+              Run your solution against the challenge tests.
+            </p>
 
-            {(passed ||
-              completed) && (
+            <div className="flex flex-wrap gap-2">
+              {(passed || completed) && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={onNext}
+                >
+                  Continue →
+                </button>
+              )}
+
               <button
-                className="btn-secondary"
-                onClick={onNext}
+                type="button"
+                className="btn-primary min-w-36"
+                disabled={busy || !code.trim()}
+                onClick={onRun}
               >
-                Continue →
+                {busy ? "Running tests…" : "Run & submit"}
               </button>
-            )}
+            </div>
           </div>
-        </>
+        </section>
       )}
 
       {/* ===============================================
@@ -581,10 +608,9 @@ function Exercise({
           setAnswer={setAnswer}
           busy={busy}
           completed={completed}
-          answerCorrect={
-            answerCorrect
-          }
-          placeholder="Enter your answer..."
+          answerCorrect={answerCorrect}
+          label="What will the program output?"
+          placeholder="Type the exact output..."
           onRun={onRun}
           onNext={onNext}
         />
@@ -592,10 +618,6 @@ function Exercise({
 
       {/* ===============================================
           MULTIPLE CHOICE
-          
-          Current DB schema does not expose structured
-          option objects yet, so answer entry remains
-          text-based for now.
       =============================================== */}
 
       {isMultipleChoice && (
@@ -604,9 +626,8 @@ function Exercise({
           setAnswer={setAnswer}
           busy={busy}
           completed={completed}
-          answerCorrect={
-            answerCorrect
-          }
+          answerCorrect={answerCorrect}
+          label="Your answer"
           placeholder="Enter the correct option..."
           onRun={onRun}
           onNext={onNext}
@@ -614,18 +635,29 @@ function Exercise({
       )}
 
       {/* ===============================================
-          ERROR / WRONG ANSWER
+          ERROR
       =============================================== */}
 
       {error && (
-        <div className="card !border-red-900 bg-red-950/20 text-red-300">
-          <p className="font-bold">
-            Not quite yet
-          </p>
+        <div
+          aria-live="polite"
+          className="rounded-2xl border border-red-900/80 bg-red-950/20 px-5 py-4"
+        >
+          <div className="flex gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-950 text-sm font-black text-red-300">
+              !
+            </span>
 
-          <p className="mt-1 text-sm">
-            {error}
-          </p>
+            <div>
+              <p className="font-bold text-red-300">
+                Not quite yet
+              </p>
+
+              <p className="mt-1 text-sm leading-6 text-red-200/70">
+                {error}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
@@ -633,11 +665,7 @@ function Exercise({
           CODE RESULT
       =============================================== */}
 
-      {result && (
-        <ResultPanel
-          result={result}
-        />
-      )}
+      {result && <ResultPanel result={result} />}
     </div>
   );
 }
@@ -652,109 +680,106 @@ function NonCodeAnswer({
   busy,
   completed,
   answerCorrect,
+  label,
   placeholder,
   onRun,
   onNext,
 }: {
   answer: string;
-
-  setAnswer: (
-    value: string,
-  ) => void;
-
+  setAnswer: (value: string) => void;
   busy: boolean;
-
   completed: boolean;
-
   answerCorrect: boolean;
-
+  label: string;
   placeholder: string;
-
   onRun: () => void;
-
   onNext: () => void;
 }) {
-  const solved =
-    completed || answerCorrect;
+  const solved = completed || answerCorrect;
 
   return (
-    <div className="card">
+    <section className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
       {!solved ? (
         <>
-          <label
-            htmlFor="exercise-answer"
-            className="text-sm font-bold text-slate-200"
-          >
-            Your answer
-          </label>
+          <div className="border-b border-slate-800 px-6 py-4 sm:px-8">
+            <p className="text-sm font-bold text-slate-200">
+              {label}
+            </p>
 
-          <input
-            id="exercise-answer"
-            type="text"
-            value={answer}
-            disabled={busy}
-            autoComplete="off"
-            onChange={(e) =>
-              setAnswer(
-                e.target.value,
-              )
-            }
-            onKeyDown={(e) => {
-              if (
-                e.key === "Enter" &&
-                answer.trim() &&
-                !busy
-              ) {
-                onRun();
-              }
-            }}
-            placeholder={
-              placeholder
-            }
-            className="mt-3 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-amber-400"
-          />
+            <p className="mt-1 text-xs text-slate-500">
+              Enter your answer exactly as Java would produce it.
+            </p>
+          </div>
 
-          <div className="mt-4">
-            <button
-              className="btn-primary"
-              disabled={
-                busy ||
-                !answer.trim()
-              }
-              onClick={onRun}
-            >
-              {busy
-                ? "Checking…"
-                : "Check answer"}
-            </button>
+          <div className="px-6 py-6 sm:px-8">
+            <input
+              id="exercise-answer"
+              aria-label={label}
+              type="text"
+              value={answer}
+              disabled={busy}
+              autoComplete="off"
+              onChange={(e) => setAnswer(e.target.value)}
+              onKeyDown={(e) => {
+                if (
+                  e.key === "Enter" &&
+                  answer.trim() &&
+                  !busy
+                ) {
+                  onRun();
+                }
+              }}
+              placeholder={placeholder}
+              className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-5 py-4 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10"
+            />
+
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                className="btn-primary min-w-36"
+                disabled={busy || !answer.trim()}
+                onClick={onRun}
+              >
+                {busy ? "Checking…" : "Check answer →"}
+              </button>
+            </div>
           </div>
         </>
       ) : (
-        <>
-          <div className="rounded-xl border border-emerald-800 bg-emerald-950/30 p-4">
-            <p className="font-bold text-emerald-300">
-              ✓ Correct!
-            </p>
+        <div className="px-6 py-6 sm:px-8">
+          <div className="flex flex-col gap-5 rounded-2xl border border-emerald-800/70 bg-emerald-950/20 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-950 text-lg font-black text-emerald-300">
+                ✓
+              </span>
 
-            <p className="mt-1 text-sm text-emerald-200/80">
-              Exercise completed.
-            </p>
+              <div>
+                <p className="font-black text-emerald-300">
+                  Correct answer
+                </p>
+
+                <p className="mt-1 text-sm text-emerald-200/60">
+                  Nice work. This exercise is complete.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn-primary shrink-0"
+              onClick={onNext}
+            >
+              Continue →
+            </button>
           </div>
-
-          <button
-            className="btn-primary mt-4"
-            onClick={onNext}
-          >
-            Continue →
-          </button>
-        </>
+        </div>
       )}
-    </div>
+    </section>
   );
 }
 
 // =====================================================
-// CODE RESULT PANEL
+// RESULT PANEL
 // =====================================================
 
 function ResultPanel({
@@ -762,121 +787,173 @@ function ResultPanel({
 }: {
   result: SubmissionResultDto;
 }) {
-  const passed =
-    result.status === "PASSED";
+  const passed = result.status === "PASSED";
+
+  const passedTests = result.tests.filter(
+    (test) => test.passed,
+  ).length;
 
   return (
     <section
       aria-live="polite"
-      className={`card ${
+      className={`overflow-hidden rounded-3xl border ${
         passed
-          ? "!border-emerald-700"
-          : "!border-red-900"
+          ? "border-emerald-800/80 bg-emerald-950/10"
+          : "border-red-900/80 bg-red-950/10"
       }`}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p
-            className={`font-bold ${
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 px-5 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <span
+            className={`flex h-9 w-9 items-center justify-center rounded-full font-black ${
               passed
-                ? "text-emerald-300"
-                : "text-red-300"
+                ? "bg-emerald-950 text-emerald-300"
+                : "bg-red-950 text-red-300"
             }`}
           >
-            {passed
-              ? "All tests passed"
-              : "Keep iterating"}
-          </p>
+            {passed ? "✓" : "!"}
+          </span>
 
-          <p className="mt-1 text-sm text-slate-400">
-            Score {result.score} ·{" "}
-            {result.runtimeMs ??
-              0}{" "}
-            ms
-          </p>
+          <div>
+            <p
+              className={`font-black ${
+                passed
+                  ? "text-emerald-300"
+                  : "text-red-300"
+              }`}
+            >
+              {passed
+                ? "All tests passed"
+                : "Keep iterating"}
+            </p>
+
+            <p className="mt-0.5 text-xs text-slate-500">
+              {passedTests}/{result.tests.length} tests passed ·{" "}
+              {result.runtimeMs ?? 0} ms
+            </p>
+          </div>
         </div>
 
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-bold ${
-            passed
-              ? "bg-emerald-950 text-emerald-300"
-              : "bg-red-950 text-red-300"
-          }`}
-        >
-          {result.status}
-        </span>
-      </div>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-slate-300">
+            Score {result.score}
+          </span>
 
-      {result.errorText && (
-        <pre className="mt-4 overflow-auto rounded-xl bg-slate-950 p-4 text-sm text-red-200">
-          {result.errorText}
-        </pre>
-      )}
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-black ${
+              passed
+                ? "bg-emerald-950 text-emerald-300"
+                : "bg-red-950 text-red-300"
+            }`}
+          >
+            {result.status}
+          </span>
+        </div>
+      </header>
 
-      <div className="mt-4 grid gap-3">
-        {result.tests.map(
-          (test) => (
+      <div className="p-4 sm:p-5">
+        {result.errorText && (
+          <div className="mb-4">
+            <p className="mb-2 text-xs font-black uppercase tracking-wider text-red-400">
+              Error
+            </p>
+
+            <pre className="overflow-auto rounded-xl border border-red-950 bg-slate-950 p-4 text-sm leading-6 text-red-200">
+              {result.errorText}
+            </pre>
+          </div>
+        )}
+
+        <div className="grid gap-2">
+          {result.tests.map((test) => (
             <div
               key={test.position}
-              className="rounded-lg bg-slate-950/60 px-3 py-3 text-sm"
+              className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/50"
             >
-              <div className="flex justify-between">
-                <span>
-                  {test.hidden
-                    ? "Hidden test"
-                    : `Test ${test.position}`}
-                </span>
+              <div className="flex items-center justify-between gap-3 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      test.passed
+                        ? "bg-emerald-400"
+                        : "bg-red-400"
+                    }`}
+                  />
+
+                  <span className="text-sm font-semibold text-slate-300">
+                    {test.hidden
+                      ? "Hidden test"
+                      : `Test ${test.position}`}
+                  </span>
+                </div>
 
                 <span
-                  className={
+                  className={`text-xs font-bold ${
                     test.passed
                       ? "text-emerald-300"
                       : "text-red-300"
-                  }
+                  }`}
                 >
-                  {test.passed
-                    ? "Passed"
-                    : "Failed"}
+                  {test.passed ? "Passed" : "Failed"}
                 </span>
               </div>
 
               {!test.hidden &&
                 !test.passed &&
-                test.expectedOutput !==
-                  null && (
-                  <div className="mt-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                      Expected
-                      output
-                    </p>
+                (test.expectedOutput !== null ||
+                  test.stdout !== null) && (
+                  <div className="grid gap-px border-t border-slate-800 bg-slate-800 md:grid-cols-2">
+                    {test.expectedOutput !== null && (
+                      <div className="bg-slate-950 p-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
+                          Expected
+                        </p>
 
-                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-emerald-200">
-                      {
-                        test.expectedOutput
-                      }
-                    </pre>
-                  </div>
-                )}
+                        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-sm leading-6 text-emerald-200">
+                          {test.expectedOutput}
+                        </pre>
+                      </div>
+                    )}
 
-              {!test.hidden &&
-                !test.passed &&
-                test.stdout !==
-                  null && (
-                  <div className="mt-3">
-                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
-                      Your output
-                    </p>
+                    {test.stdout !== null && (
+                      <div className="bg-slate-950 p-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
+                          Your output
+                        </p>
 
-                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-slate-200">
-                      {test.stdout ||
-                        "(no output)"}
-                    </pre>
+                        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-sm leading-6 text-slate-200">
+                          {test.stdout || "(no output)"}
+                        </pre>
+                      </div>
+                    )}
                   </div>
                 )}
             </div>
-          ),
-        )}
+          ))}
+        </div>
       </div>
     </section>
+  );
+}
+
+// =====================================================
+// EMPTY STATE
+// =====================================================
+
+function EmptyQuest() {
+  return (
+    <div className="rounded-3xl border border-dashed border-slate-700 bg-slate-900/40 px-6 py-16 text-center">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-xl">
+        ◇
+      </div>
+
+      <h2 className="mt-4 text-lg font-black text-slate-200">
+        Nothing here yet
+      </h2>
+
+      <p className="mt-2 text-sm text-slate-500">
+        This quest does not have any learning content yet.
+      </p>
+    </div>
   );
 }
