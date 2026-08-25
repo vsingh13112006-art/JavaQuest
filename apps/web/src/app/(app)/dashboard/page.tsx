@@ -14,12 +14,14 @@ import type {
 } from "@javaquets/shared";
 
 import { useAuth } from "@/features/auth/auth-context";
+
 import {
   getCourseProgress,
   getEnrollments,
 } from "@/services/learner";
 
 import { ProgressBar } from "@/components/progress-bar";
+
 import {
   EmptyState,
   ErrorState,
@@ -54,6 +56,7 @@ export default function Dashboard() {
           enrollments.map(
             async (enrollment) => ({
               enrollment,
+
               progress: await getCourseProgress(
                 enrollment.courseSlug,
               ).catch(() => null),
@@ -75,7 +78,9 @@ export default function Dashboard() {
       });
   }, []);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   // =====================================================
   // DERIVED STATS
@@ -106,7 +111,7 @@ export default function Dashboard() {
       : 0;
 
   // =====================================================
-  // CONTINUE LEARNING COURSE
+  // CONTINUE LEARNING
   // =====================================================
 
   const continueItem = useMemo(() => {
@@ -125,7 +130,8 @@ export default function Dashboard() {
   }, [items]);
 
   const firstName =
-    user?.displayName?.split(" ")[0] ?? "learner";
+    user?.displayName?.split(" ")[0] ??
+    "learner";
 
   return (
     <div className="mx-auto w-full max-w-[1450px]">
@@ -147,7 +153,8 @@ export default function Dashboard() {
             </h1>
 
             <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-slate-400">
-              Pick up where you left off and keep building your Java skills one quest at a time.
+              Pick up where you left off and keep building
+              your Java skills one quest at a time.
             </p>
           </div>
 
@@ -162,15 +169,10 @@ export default function Dashboard() {
       </section>
 
       {/* =================================================
-          GAMIFICATION
-      ================================================= */}
+          PRIMARY LEARNING AREA
 
-      <div className="mt-5">
-        <GamificationSummary />
-      </div>
-
-      {/* =================================================
-          TOP GRID
+          IMPORTANT:
+          Continue Learning comes BEFORE Gamification.
       ================================================= */}
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]">
@@ -216,7 +218,10 @@ export default function Dashboard() {
                     </p>
 
                     <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-100">
-                      {continueItem.enrollment.courseTitle}
+                      {
+                        continueItem.enrollment
+                          .courseTitle
+                      }
                     </h3>
 
                     <p className="mt-2 text-sm text-slate-400">
@@ -259,7 +264,8 @@ export default function Dashboard() {
 
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm text-slate-500">
-                    Continue from your current course position.
+                    Continue from your current course
+                    position.
                   </p>
 
                   <Link
@@ -282,7 +288,8 @@ export default function Dashboard() {
                 </h3>
 
                 <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                  Enroll in a learning path and your current progress will appear here.
+                  Enroll in a learning path and your
+                  current progress will appear here.
                 </p>
 
                 <Link
@@ -297,7 +304,7 @@ export default function Dashboard() {
         </section>
 
         {/* ===============================================
-            PROGRESS SUMMARY
+            LEARNING OVERVIEW
         =============================================== */}
 
         <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6">
@@ -338,11 +345,21 @@ export default function Dashboard() {
             </div>
 
             <div className="mt-3">
-              <ProgressBar value={averageProgress} />
+              <ProgressBar
+                value={averageProgress}
+              />
             </div>
           </div>
         </section>
       </div>
+
+      {/* =================================================
+          GAMIFICATION
+
+          Now secondary to learning.
+      ================================================= */}
+
+      <GamificationSummary />
 
       {/* =================================================
           MY LEARNING
@@ -363,18 +380,20 @@ export default function Dashboard() {
             </h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              Track every enrolled learning path from one place.
+              Track every enrolled learning path from
+              one place.
             </p>
           </div>
 
-          {!loading && items.length > 0 && (
-            <span className="badge-neutral">
-              {items.length}{" "}
-              {items.length === 1
-                ? "course"
-                : "courses"}
-            </span>
-          )}
+          {!loading &&
+            items.length > 0 && (
+              <span className="badge-neutral">
+                {items.length}{" "}
+                {items.length === 1
+                  ? "course"
+                  : "courses"}
+              </span>
+            )}
         </div>
 
         <div className="mt-5">
@@ -399,13 +418,19 @@ export default function Dashboard() {
               }
             />
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div
+              className={
+                items.length === 1
+                  ? "grid gap-4"
+                  : "grid gap-4 lg:grid-cols-2"
+              }
+            >
               {items.map(
                 ({
                   enrollment,
                   progress,
                 }) => {
-                  const completed =
+                  const courseCompleted =
                     enrollment.status ===
                     "COMPLETED";
 
@@ -422,7 +447,7 @@ export default function Dashboard() {
                           <div className="min-w-0">
                             <span
                               className={
-                                completed
+                                courseCompleted
                                   ? "badge-success"
                                   : "badge-warning"
                               }
@@ -439,7 +464,7 @@ export default function Dashboard() {
                             </h3>
                           </div>
 
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-slate-950/50 text-slate-500 transition group-hover:text-amber-300">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-slate-950/50 text-slate-500 transition group-hover:border-amber-400/30 group-hover:text-amber-300">
                             →
                           </div>
                         </div>
