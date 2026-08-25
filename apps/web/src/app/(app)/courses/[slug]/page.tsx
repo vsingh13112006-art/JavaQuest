@@ -16,6 +16,7 @@ import type {
 } from "@javaquets/shared";
 
 import { getCourse } from "@/services/courses";
+
 import {
   enroll,
   getCourseProgress,
@@ -23,14 +24,15 @@ import {
 } from "@/services/learner";
 
 import { ProgressBar } from "@/components/progress-bar";
+
 import {
   ErrorState,
   LoadingState,
 } from "@/components/states";
 
-// =====================================================
-// WEEK METADATA
-// =====================================================
+/* =====================================================
+   WEEK METADATA
+===================================================== */
 
 const WEEK_TITLES: Record<number, string> = {
   1: "Java Foundations",
@@ -50,21 +52,21 @@ const WEEK_DESCRIPTIONS: Record<number, string> = {
   4: "Inheritance, abstraction aur polymorphism",
   5: "Production-style data structures",
   6: "Exceptions, files aur modern Java",
-  7: "SQL, JDBC aur persistent data",
-  8: "Architecture, testing aur final project",
+  7: "SQL, JDBC aur persistent applications",
+  8: "Architecture, testing aur final capstone",
 };
 
-function getWeekNumber(modulePosition: number) {
-  return Math.ceil(modulePosition / 8);
+function getWeekNumber(position: number) {
+  return Math.ceil(position / 8);
 }
 
-function getModuleNumberInWeek(modulePosition: number) {
-  return ((modulePosition - 1) % 8) + 1;
+function getModuleNumber(position: number) {
+  return ((position - 1) % 8) + 1;
 }
 
-// =====================================================
-// COURSE PAGE
-// =====================================================
+/* =====================================================
+   PAGE
+===================================================== */
 
 export default function CoursePage() {
   const slug = String(useParams().slug);
@@ -87,22 +89,26 @@ export default function CoursePage() {
   const [openWeeks, setOpenWeeks] =
     useState<number[]>([]);
 
-  // =====================================================
-  // LOAD COURSE
-  // =====================================================
+  const [openModules, setOpenModules] =
+    useState<string[]>([]);
+
+  /* =====================================================
+     LOAD
+  ===================================================== */
 
   const load = useCallback(() => {
     setLoading(true);
+    setError("");
 
     Promise.all([
       getCourse(slug),
       getEnrollments(),
     ])
-      .then(async ([c, e]) => {
-        setCourse(c);
+      .then(async ([courseData, enrollments]) => {
+        setCourse(courseData);
 
         const found =
-          e.find(
+          enrollments.find(
             (item) =>
               item.courseSlug === slug,
           ) ?? null;
@@ -124,22 +130,23 @@ export default function CoursePage() {
             : "Could not load course",
         ),
       )
-      .finally(() =>
-        setLoading(false),
-      );
+      .finally(() => {
+        setLoading(false);
+      });
   }, [slug]);
 
   useEffect(load, [load]);
 
-  // =====================================================
-  // ENROLL
-  // =====================================================
+  /* =====================================================
+     ENROLL
+  ===================================================== */
 
   async function join() {
     try {
-      setEnrollment(
-        await enroll(slug),
-      );
+      const result =
+        await enroll(slug);
+
+      setEnrollment(result);
 
       setProgress(
         await getCourseProgress(slug),
@@ -153,9 +160,9 @@ export default function CoursePage() {
     }
   }
 
-  // =====================================================
-  // QUEST STATUS HELPER
-  // =====================================================
+  /* =====================================================
+     STATUS
+  ===================================================== */
 
   const getQuestStatus = useCallback(
     (questSlug: string) =>
@@ -166,11 +173,11 @@ export default function CoursePage() {
     [progress],
   );
 
-  // =====================================================
-  // SORT MODULES
-  // =====================================================
+  /* =====================================================
+     SORT MODULES
+  ===================================================== */
 
-  const sortedModules = useMemo(() => {
+  const modules = useMemo(() => {
     if (!course) return [];
 
     return [...course.modules].sort(
@@ -179,55 +186,58 @@ export default function CoursePage() {
     );
   }, [course]);
 
-  // =====================================================
-  // GROUP MODULES BY WEEK
-  // =====================================================
+  /* =====================================================
+     GROUP BY WEEK
+  ===================================================== */
 
   const weeks = useMemo(() => {
     const grouped = new Map<
       number,
-      typeof sortedModules
+      typeof modules
     >();
 
-    for (const module of sortedModules) {
-      const weekNumber =
-        getWeekNumber(module.position);
+    for (const module of modules) {
+      const week =
+        getWeekNumber(
+          module.position,
+        );
 
-      const existing =
-        grouped.get(weekNumber) ?? [];
+      const current =
+        grouped.get(week) ?? [];
 
-      existing.push(module);
+      current.push(module);
 
       grouped.set(
-        weekNumber,
-        existing,
+        week,
+        current,
       );
     }
 
-    return Array.from(grouped.entries())
+    return Array.from(
+      grouped.entries(),
+    )
       .sort(([a], [b]) => a - b)
-      .map(
-        ([
-          weekNumber,
-          modules,
-        ]) => ({
-          weekNumber,
-          modules,
-        }),
-      );
-  }, [sortedModules]);
+      .map(([weekNumber, weekModules]) => ({
+        weekNumber,
+        modules: weekModules,
+      }));
+  }, [modules]);
 
-  // =====================================================
-  // FIND CURRENT QUEST / MODULE / WEEK
-  // =====================================================
+  /* =====================================================
+     CURRENT QUEST
+  ===================================================== */
 
   const currentQuest = useMemo(() => {
-    for (const module of sortedModules) {
+    for (const module of modules) {
       for (const quest of module.quests) {
-        if (
+        const status =
           getQuestStatus(
             quest.slug,
-          ) !== "COMPLETED"
+          );
+
+        if (
+          status !==
+          "COMPLETED"
         ) {
           return {
             quest,
@@ -239,7 +249,7 @@ export default function CoursePage() {
 
     return null;
   }, [
-    sortedModules,
+    modules,
     getQuestStatus,
   ]);
 
@@ -250,55 +260,80 @@ export default function CoursePage() {
         )
       : weeks.at(-1)?.weekNumber ?? 1;
 
-  // =====================================================
-  // AUTO OPEN CURRENT WEEK
-  // =====================================================
+  /* =====================================================
+     AUTO OPEN CURRENT WEEK/MODULE
+  ===================================================== */
 
   useEffect(() => {
-    if (weeks.length === 0) return;
+    if (
+      weeks.length === 0
+    ) {
+      return;
+    }
 
-    setOpenWeeks((existing) => {
-      if (
-        existing.includes(currentWeek)
-      ) {
-        return existing;
-      }
+    setOpenWeeks((current) =>
+      current.length === 0
+        ? [currentWeek]
+        : current,
+    );
 
-      // Initial experience:
-      // only current week is expanded.
-      if (existing.length === 0) {
-        return [currentWeek];
-      }
-
-      return [
-        ...existing,
-        currentWeek,
-      ];
-    });
+    if (currentQuest) {
+      setOpenModules(
+        (current) =>
+          current.length === 0
+            ? [
+                currentQuest
+                  .module.slug,
+              ]
+            : current,
+      );
+    }
   }, [
     currentWeek,
+    currentQuest,
     weeks.length,
   ]);
 
+  /* =====================================================
+     TOGGLE HELPERS
+  ===================================================== */
+
   function toggleWeek(
-    weekNumber: number,
+    week: number,
   ) {
-    setOpenWeeks((existing) =>
-      existing.includes(weekNumber)
-        ? existing.filter(
-            (week) =>
-              week !== weekNumber,
+    setOpenWeeks((current) =>
+      current.includes(week)
+        ? current.filter(
+            (item) =>
+              item !== week,
           )
         : [
-            ...existing,
-            weekNumber,
+            ...current,
+            week,
           ],
     );
   }
 
-  // =====================================================
-  // LOADING / ERROR
-  // =====================================================
+  function toggleModule(
+    moduleSlug: string,
+  ) {
+    setOpenModules((current) =>
+      current.includes(moduleSlug)
+        ? current.filter(
+            (item) =>
+              item !==
+              moduleSlug,
+          )
+        : [
+            ...current,
+            moduleSlug,
+          ],
+    );
+  }
+
+  /* =====================================================
+     STATES
+  ===================================================== */
 
   if (loading) {
     return (
@@ -306,7 +341,10 @@ export default function CoursePage() {
     );
   }
 
-  if (error && !course) {
+  if (
+    error &&
+    !course
+  ) {
     return (
       <ErrorState
         message={error}
@@ -315,73 +353,124 @@ export default function CoursePage() {
     );
   }
 
-  if (!course) return null;
-
-  // =====================================================
-  // CONTINUE QUEST
-  // =====================================================
+  if (!course) {
+    return null;
+  }
 
   const firstQuest =
-    sortedModules[0]?.quests[0];
+    modules[0]?.quests[0];
 
   const continueQuestSlug =
     currentQuest?.quest.slug ??
     firstQuest?.slug;
 
-  // =====================================================
-  // RENDER
-  // =====================================================
+  /* =====================================================
+     RENDER
+  ===================================================== */
 
   return (
     <>
+      {/* =================================================
+          BACK LINK
+      ================================================= */}
+
       <Link
-        className="text-sm text-slate-400"
+        className="inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-slate-200"
         href="/courses"
       >
-        ← All courses
+        <span>←</span>
+        <span>
+          All courses
+        </span>
       </Link>
 
-      <div className="mt-5 grid gap-8 lg:grid-cols-[1fr_320px]">
-        {/* =================================================
-            MAIN COURSE
-        ================================================= */}
+      {/* =================================================
+          HERO
+      ================================================= */}
 
-        <section>
-          <p className="eyebrow">
-            {course.difficulty} course
-          </p>
+      <div className="mt-7 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <section className="min-w-0">
+          <div className="max-w-3xl">
+            <p className="eyebrow">
+              {course.difficulty} course
+            </p>
 
-          <h1 className="mt-3 text-4xl font-black">
-            {course.title}
-          </h1>
+            <h1 className="mt-3 text-balance text-4xl font-black tracking-tight sm:text-5xl">
+              {course.title}
+            </h1>
 
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-400">
-            {course.description}
-          </p>
+            <p className="mt-4 text-pretty text-base leading-8 text-slate-400 sm:text-lg">
+              {course.description}
+            </p>
+
+            {/* ===========================================
+                QUICK STATS
+            =========================================== */}
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <div className="badge-neutral">
+                {
+                  weeks.length
+                }{" "}
+                weeks
+              </div>
+
+              <div className="badge-neutral">
+                {
+                  modules.length
+                }{" "}
+                modules
+              </div>
+
+              <div className="badge-neutral">
+                {modules.reduce(
+                  (
+                    total,
+                    module,
+                  ) =>
+                    total +
+                    module.quests
+                      .length,
+                  0,
+                )}{" "}
+                quests
+              </div>
+
+              {enrollment && (
+                <div className="badge-warning">
+                  Week{" "}
+                  {currentWeek}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* ===============================================
-              WEEK GROUPS
+              WEEK LIST
           =============================================== */}
 
-          <div className="mt-10 space-y-5">
+          <div className="mt-10 space-y-4">
             {weeks.map(
               ({
                 weekNumber,
-                modules,
+                modules: weekModules,
               }) => {
-                const isOpen =
+                const weekOpen =
                   openWeeks.includes(
                     weekNumber,
                   );
 
-                const weekQuests =
-                  modules.flatMap(
+                const quests =
+                  weekModules.flatMap(
                     (module) =>
                       module.quests,
                   );
 
-                const completedQuests =
-                  weekQuests.filter(
+                const total =
+                  quests.length;
+
+                const completeCount =
+                  quests.filter(
                     (quest) =>
                       getQuestStatus(
                         quest.slug,
@@ -389,42 +478,51 @@ export default function CoursePage() {
                       "COMPLETED",
                   ).length;
 
-                const totalQuests =
-                  weekQuests.length;
-
-                const weekPercent =
-                  totalQuests === 0
+                const percent =
+                  total === 0
                     ? 0
                     : Math.round(
-                        (completedQuests /
-                          totalQuests) *
+                        (completeCount /
+                          total) *
                           100,
                       );
 
-                const weekCompleted =
-                  totalQuests > 0 &&
-                  completedQuests ===
-                    totalQuests;
+                const completed =
+                  total > 0 &&
+                  completeCount ===
+                    total;
 
-                const isCurrentWeek =
-                  enrollment &&
+                const active =
+                  Boolean(
+                    enrollment,
+                  ) &&
                   weekNumber ===
                     currentWeek &&
-                  !weekCompleted;
+                  !completed;
 
-                const isFutureWeek =
-                  enrollment &&
+                const future =
+                  Boolean(
+                    enrollment,
+                  ) &&
                   weekNumber >
                     currentWeek;
 
                 return (
-                  <div
-                    key={weekNumber}
-                    className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40"
+                  <article
+                    key={
+                      weekNumber
+                    }
+                    className={`overflow-hidden rounded-[22px] border transition duration-200 ${
+                      active
+                        ? "border-amber-400/40 bg-amber-400/[0.025]"
+                        : completed
+                          ? "border-emerald-900/60 bg-emerald-950/[0.08]"
+                          : "border-slate-800 bg-slate-900/40"
+                    }`}
                   >
-                    {/* =====================================
-                        WEEK HEADER
-                    ===================================== */}
+                    {/* ===================================
+                        WEEK BUTTON
+                    =================================== */}
 
                     <button
                       type="button"
@@ -433,67 +531,67 @@ export default function CoursePage() {
                           weekNumber,
                         )
                       }
-                      className="w-full p-6 text-left transition hover:bg-slate-800/40"
+                      className="w-full px-5 py-5 text-left sm:px-6 sm:py-6"
                     >
-                      <div className="flex items-start justify-between gap-6">
+                      <div className="flex items-start justify-between gap-5">
                         <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-400">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="eyebrow">
                               Week{" "}
                               {weekNumber}
-                            </p>
+                            </span>
 
-                            {weekCompleted && (
-                              <span className="rounded-full bg-emerald-950 px-3 py-1 text-xs font-bold text-emerald-300">
+                            {completed && (
+                              <span className="badge-success">
                                 ✓ Completed
                               </span>
                             )}
 
-                            {isCurrentWeek && (
-                              <span className="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-bold text-amber-300">
-                                Current week
+                            {active && (
+                              <span className="badge-warning">
+                                Current
                               </span>
                             )}
 
-                            {isFutureWeek && (
-                              <span className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">
+                            {future && (
+                              <span className="badge-neutral">
                                 Upcoming
                               </span>
                             )}
                           </div>
 
-                          <h2 className="mt-2 text-2xl font-black">
+                          <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">
                             {WEEK_TITLES[
                               weekNumber
                             ] ??
                               `Week ${weekNumber}`}
                           </h2>
 
-                          <p className="mt-2 text-sm leading-6 text-slate-400">
+                          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
                             {WEEK_DESCRIPTIONS[
                               weekNumber
                             ] ??
-                              "Continue your Java learning journey."}
+                              "Continue your Java journey."}
                           </p>
 
-                          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
+                          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-slate-500">
                             <span>
                               {
-                                modules.length
+                                weekModules.length
                               }{" "}
                               modules
                             </span>
 
                             <span>
                               {
-                                totalQuests
+                                total
                               }{" "}
                               quests
                             </span>
 
                             <span>
                               {
-                                completedQuests
+                                completeCount
                               }{" "}
                               completed
                             </span>
@@ -501,51 +599,55 @@ export default function CoursePage() {
                         </div>
 
                         <div className="flex shrink-0 items-center gap-4">
-                          <div className="hidden w-32 sm:block">
-                            <div className="flex items-center justify-between text-xs text-slate-400">
+                          <div className="hidden min-w-[120px] sm:block">
+                            <div className="flex items-center justify-between text-xs text-slate-500">
                               <span>
                                 Progress
                               </span>
 
-                              <span>
+                              <span className="font-semibold text-slate-300">
                                 {
-                                  weekPercent
+                                  percent
                                 }
                                 %
                               </span>
                             </div>
 
-                            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800">
+                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
                               <div
-                                className="h-full rounded-full bg-amber-400 transition-all"
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  completed
+                                    ? "bg-emerald-400"
+                                    : "bg-amber-400"
+                                }`}
                                 style={{
-                                  width: `${weekPercent}%`,
+                                  width: `${percent}%`,
                                 }}
                               />
                             </div>
                           </div>
 
-                          <span className="text-xl text-slate-400">
-                            {isOpen
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-800 bg-slate-950/40 text-lg text-slate-400">
+                            {weekOpen
                               ? "⌄"
                               : "›"}
-                          </span>
+                          </div>
                         </div>
                       </div>
                     </button>
 
-                    {/* =====================================
-                        MODULES INSIDE WEEK
-                    ===================================== */}
+                    {/* ===================================
+                        MODULES
+                    =================================== */}
 
-                    {isOpen && (
-                      <div className="border-t border-slate-800 p-5">
-                        <div className="space-y-4">
-                          {modules.map(
+                    {weekOpen && (
+                      <div className="border-t border-slate-800/80 px-4 py-4 sm:px-5">
+                        <div className="space-y-2">
+                          {weekModules.map(
                             (module) => {
-                              const moduleNumber =
-                                getModuleNumberInWeek(
-                                  module.position,
+                              const moduleOpen =
+                                openModules.includes(
+                                  module.slug,
                                 );
 
                               const moduleCompleted =
@@ -559,139 +661,212 @@ export default function CoursePage() {
                                     "COMPLETED",
                                 );
 
-                              const isCurrentModule =
+                              const currentModule =
                                 currentQuest
                                   ?.module
                                   .slug ===
                                 module.slug;
 
+                              const moduleQuestCount =
+                                module.quests
+                                  .length;
+
+                              const moduleCompletedCount =
+                                module.quests.filter(
+                                  (quest) =>
+                                    getQuestStatus(
+                                      quest.slug,
+                                    ) ===
+                                    "COMPLETED",
+                                ).length;
+
                               return (
                                 <div
-                                  className={`rounded-2xl border p-5 ${
-                                    isCurrentModule
-                                      ? "border-amber-500/60 bg-amber-400/[0.04]"
-                                      : "border-slate-800 bg-slate-950/20"
-                                  }`}
                                   key={
                                     module.slug
                                   }
+                                  className={`overflow-hidden rounded-2xl border transition ${
+                                    currentModule
+                                      ? "border-amber-400/30 bg-amber-400/[0.035]"
+                                      : "border-slate-800/80 bg-slate-950/20"
+                                  }`}
                                 >
                                   {/* =======================
                                       MODULE HEADER
                                   ======================= */}
 
-                                  <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                      <div className="flex flex-wrap items-center gap-2">
-                                        <p className="text-sm font-semibold text-amber-400">
-                                          Module{" "}
-                                          {
-                                            moduleNumber
-                                          }
-                                        </p>
-
-                                        {moduleCompleted && (
-                                          <span className="text-xs font-bold text-emerald-300">
-                                            ✓
-                                          </span>
-                                        )}
-
-                                        {isCurrentModule &&
-                                          !moduleCompleted && (
-                                            <span className="rounded-full bg-amber-400/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-300">
-                                              Current
-                                            </span>
-                                          )}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      toggleModule(
+                                        module.slug,
+                                      )
+                                    }
+                                    className="flex w-full items-center justify-between gap-4 p-4 text-left sm:p-5"
+                                  >
+                                    <div className="flex min-w-0 items-start gap-4">
+                                      <div
+                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-black ${
+                                          moduleCompleted
+                                            ? "bg-emerald-950 text-emerald-300"
+                                            : currentModule
+                                              ? "bg-amber-400 text-slate-950"
+                                              : "bg-slate-800 text-slate-300"
+                                        }`}
+                                      >
+                                        {moduleCompleted
+                                          ? "✓"
+                                          : getModuleNumber(
+                                              module.position,
+                                            )}
                                       </div>
 
-                                      <h3 className="mt-1 text-xl font-bold">
-                                        {
-                                          module.title
-                                        }
-                                      </h3>
+                                      <div className="min-w-0">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                            Module{" "}
+                                            {getModuleNumber(
+                                              module.position,
+                                            )}
+                                          </span>
 
-                                      <p className="mt-2 text-sm leading-6 text-slate-400">
-                                        {
-                                          module.description
-                                        }
-                                      </p>
+                                          {currentModule &&
+                                            !moduleCompleted && (
+                                              <span className="badge-warning">
+                                                Current
+                                              </span>
+                                            )}
+                                        </div>
+
+                                        <h3 className="mt-1 text-base font-bold text-slate-100 sm:text-lg">
+                                          {
+                                            module.title
+                                          }
+                                        </h3>
+
+                                        <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500">
+                                          {
+                                            module.description
+                                          }
+                                        </p>
+                                      </div>
                                     </div>
 
-                                    <span className="shrink-0 text-sm text-slate-500">
-                                      {
-                                        module
-                                          .quests
-                                          .length
-                                      }{" "}
-                                      quests
-                                    </span>
-                                  </div>
+                                    <div className="flex shrink-0 items-center gap-3">
+                                      <span className="hidden text-xs text-slate-500 sm:inline">
+                                        {
+                                          moduleCompletedCount
+                                        }
+                                        /
+                                        {
+                                          moduleQuestCount
+                                        }
+                                      </span>
+
+                                      <span className="text-slate-500">
+                                        {moduleOpen
+                                          ? "⌄"
+                                          : "›"}
+                                      </span>
+                                    </div>
+                                  </button>
 
                                   {/* =======================
                                       QUESTS
                                   ======================= */}
 
-                                  <div className="mt-5 space-y-2">
-                                    {module.quests.map(
-                                      (
-                                        quest,
-                                      ) => {
-                                        const status =
-                                          getQuestStatus(
-                                            quest.slug,
-                                          );
+                                  {moduleOpen && (
+                                    <div className="border-t border-slate-800/70 p-3 sm:p-4">
+                                      <div className="space-y-2">
+                                        {module.quests.map(
+                                          (
+                                            quest,
+                                            questIndex,
+                                          ) => {
+                                            const status =
+                                              getQuestStatus(
+                                                quest.slug,
+                                              );
 
-                                        return (
-                                          <Link
-                                            href={
-                                              enrollment
-                                                ? `/quests/${quest.slug}`
-                                                : "#enroll"
-                                            }
-                                            key={
-                                              quest.slug
-                                            }
-                                            className="flex items-center justify-between gap-4 rounded-xl border border-slate-800 p-4 transition hover:border-slate-700 hover:bg-slate-800/50"
-                                          >
-                                            <div className="min-w-0">
-                                              <p className="font-semibold">
-                                                {
-                                                  quest.title
+                                            const questCompleted =
+                                              status ===
+                                              "COMPLETED";
+
+                                            const questInProgress =
+                                              status ===
+                                              "IN_PROGRESS";
+
+                                            return (
+                                              <Link
+                                                key={
+                                                  quest.slug
                                                 }
-                                              </p>
-
-                                              <p className="mt-1 text-sm leading-6 text-slate-400">
-                                                {
-                                                  quest.estimatedMinutes
-                                                }{" "}
-                                                min ·{" "}
-                                                {
-                                                  quest.description
+                                                href={
+                                                  enrollment
+                                                    ? `/quests/${quest.slug}`
+                                                    : "#enroll"
                                                 }
-                                              </p>
-                                            </div>
+                                                className="group flex items-center gap-4 rounded-xl border border-transparent px-3 py-3 transition hover:border-slate-800 hover:bg-slate-800/40 sm:px-4"
+                                              >
+                                                <div
+                                                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                                    questCompleted
+                                                      ? "bg-emerald-950 text-emerald-300"
+                                                      : questInProgress
+                                                        ? "bg-amber-400 text-slate-950"
+                                                        : "bg-slate-800/80 text-slate-400"
+                                                  }`}
+                                                >
+                                                  {questCompleted
+                                                    ? "✓"
+                                                    : questIndex +
+                                                      1}
+                                                </div>
 
-                                            <span
-                                              className={`shrink-0 rounded-full px-3 py-1 text-xs ${
-                                                status ===
-                                                "COMPLETED"
-                                                  ? "bg-emerald-950 text-emerald-300"
-                                                  : status ===
-                                                      "IN_PROGRESS"
-                                                    ? "bg-amber-950 text-amber-300"
-                                                    : "bg-slate-800 text-slate-300"
-                                              }`}
-                                            >
-                                              {status.replace(
-                                                /_/g,
-                                                " ",
-                                              )}
-                                            </span>
-                                          </Link>
-                                        );
-                                      },
-                                    )}
-                                  </div>
+                                                <div className="min-w-0 flex-1">
+                                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                                    <p className="font-semibold text-slate-200 transition group-hover:text-white">
+                                                      {
+                                                        quest.title
+                                                      }
+                                                    </p>
+
+                                                    <span className="text-xs text-slate-500">
+                                                      {
+                                                        quest.estimatedMinutes
+                                                      }{" "}
+                                                      min
+                                                    </span>
+                                                  </div>
+
+                                                  <p className="mt-1 line-clamp-1 text-sm text-slate-500">
+                                                    {
+                                                      quest.description
+                                                    }
+                                                  </p>
+                                                </div>
+
+                                                <span
+                                                  className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide sm:inline-flex ${
+                                                    questCompleted
+                                                      ? "bg-emerald-950 text-emerald-300"
+                                                      : questInProgress
+                                                        ? "bg-amber-400/10 text-amber-300"
+                                                        : "bg-slate-800 text-slate-400"
+                                                  }`}
+                                                >
+                                                  {status.replace(
+                                                    /_/g,
+                                                    " ",
+                                                  )}
+                                                </span>
+                                              </Link>
+                                            );
+                                          },
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             },
@@ -699,7 +874,7 @@ export default function CoursePage() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </article>
                 );
               },
             )}
@@ -710,19 +885,25 @@ export default function CoursePage() {
             SIDEBAR
         ================================================= */}
 
-        <aside>
+        <aside className="min-w-0">
           <div
             id="enroll"
-            className="card sticky top-24"
+            className="card sticky top-24 p-5"
           >
             {enrollment ? (
               <>
-                <p className="eyebrow">
-                  {enrollment.status}
-                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="eyebrow">
+                    Your journey
+                  </p>
 
-                <h2 className="mt-2 text-xl font-bold">
-                  Your course progress
+                  <span className="badge-success">
+                    Active
+                  </span>
+                </div>
+
+                <h2 className="mt-3 text-xl font-black tracking-tight">
+                  Course progress
                 </h2>
 
                 <div className="mt-6">
@@ -734,55 +915,100 @@ export default function CoursePage() {
                   />
                 </div>
 
-                <p className="mt-4 text-sm text-slate-400">
-                  {progress?.completedQuests ??
-                    0}{" "}
-                  of{" "}
-                  {progress?.totalQuests ??
-                    0}{" "}
-                  quests completed
-                </p>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-slate-500">
+                    Completed
+                  </span>
 
-                <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/40 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  <span className="font-semibold text-slate-200">
+                    {progress?.completedQuests ??
+                      0}
+                    /
+                    {progress?.totalQuests ??
+                      0}
+                  </span>
+                </div>
+
+                {/* =========================================
+                    CURRENT STAGE
+                ========================================= */}
+
+                <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/35 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                     Current stage
                   </p>
 
-                  <p className="mt-2 font-semibold">
-                    Week {currentWeek}
-                  </p>
+                  <div className="mt-3 flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400 text-sm font-black text-slate-950">
+                      {
+                        currentWeek
+                      }
+                    </div>
 
-                  <p className="mt-1 text-sm text-slate-400">
-                    {WEEK_TITLES[
-                      currentWeek
-                    ] ??
-                      "Java learning"}
-                  </p>
+                    <div className="min-w-0">
+                      <p className="font-bold">
+                        Week{" "}
+                        {
+                          currentWeek
+                        }
+                      </p>
+
+                      <p className="mt-1 text-sm leading-5 text-slate-400">
+                        {WEEK_TITLES[
+                          currentWeek
+                        ] ??
+                          "Java learning"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {currentQuest && (
+                    <div className="mt-4 border-t border-slate-800 pt-4">
+                      <p className="text-xs text-slate-500">
+                        Up next
+                      </p>
+
+                      <p className="mt-1 text-sm font-semibold text-slate-200">
+                        {
+                          currentQuest
+                            .quest
+                            .title
+                        }
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {continueQuestSlug && (
                   <Link
-                    className="btn-primary mt-6 w-full"
+                    className="btn-primary mt-5 w-full"
                     href={`/quests/${continueQuestSlug}`}
                   >
                     Continue learning
+                    <span>
+                      →
+                    </span>
                   </Link>
                 )}
               </>
             ) : (
               <>
-                <p className="eyebrow">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-400/10 text-xl">
+                  ⚡
+                </div>
+
+                <p className="eyebrow mt-5">
                   Ready when you are
                 </p>
 
-                <h2 className="mt-2 text-xl font-bold">
-                  Join this course
+                <h2 className="mt-2 text-xl font-black">
+                  Start your Java journey
                 </h2>
 
                 <p className="mt-3 text-sm leading-6 text-slate-400">
                   Enrollment saves your
-                  quest and exercise
-                  progress.
+                  quest, exercise and
+                  course progress.
                 </p>
 
                 <button
@@ -793,6 +1019,52 @@ export default function CoursePage() {
                 </button>
               </>
             )}
+          </div>
+
+          {/* ===============================================
+              COURSE META
+          =============================================== */}
+
+          <div className="card-soft mt-4 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Learning path
+            </p>
+
+            <div className="mt-3 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">
+                  Weeks
+                </span>
+
+                <span className="font-semibold">
+                  {
+                    weeks.length
+                  }
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-slate-500">
+                  Modules
+                </span>
+
+                <span className="font-semibold">
+                  {
+                    modules.length
+                  }
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-slate-500">
+                  Difficulty
+                </span>
+
+                <span className="font-semibold capitalize">
+                  {course.difficulty.toLowerCase()}
+                </span>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
