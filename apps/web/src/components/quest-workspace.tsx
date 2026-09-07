@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   ExerciseDto,
@@ -12,6 +12,7 @@ import type {
 } from "@javaquets/shared";
 
 import { LessonContent } from "@/components/lesson-content";
+import { ErrorState } from "@/components/states";
 import { ProgressBar } from "@/components/progress-bar";
 
 import {
@@ -53,9 +54,7 @@ export function QuestWorkspace({
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState<QuestProgressDto | null>(null);
 
-  const [code, setCode] = useState(
-    quest.exercises[0]?.starterCode ?? "",
-  );
+  const [code, setCode] = useState(quest.exercises[0]?.starterCode ?? "");
 
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<SubmissionResultDto | null>(null);
@@ -64,26 +63,30 @@ export function QuestWorkspace({
   const [answerCorrect, setAnswerCorrect] = useState(false);
 
   const current = items[index];
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [progressError, setProgressError] = useState("");
+  const drafts = useRef<Record<string, string>>({});
 
   // =====================================================
   // START QUEST
   // =====================================================
 
-  useEffect(() => {
+  const loadProgress = useCallback(() => {
+    setProgressError("");
     startQuest(quest.slug)
       .then(setProgress)
       .catch(() =>
         getQuestProgress(quest.slug)
           .then(setProgress)
           .catch((e) =>
-            setError(
-              e instanceof Error
-                ? e.message
-                : "Could not start quest",
+            setProgressError(
+              e instanceof Error ? e.message : "Could not start quest",
             ),
           ),
       );
   }, [quest.slug]);
+
+  useEffect(loadProgress, [loadProgress]);
 
   // =====================================================
   // RESET CURRENT ITEM STATE
@@ -91,13 +94,14 @@ export function QuestWorkspace({
 
   useEffect(() => {
     if (current?.type === "exercise") {
-      setCode(current.starterCode ?? "");
+      setCode(drafts.current[current.slug] ?? current.starterCode ?? "");
     }
 
     setAnswer("");
     setAnswerCorrect(false);
     setResult(null);
     setError("");
+    // Draft edits do not reset evaluation or answer state.
   }, [current]);
 
   // =====================================================
@@ -105,16 +109,13 @@ export function QuestWorkspace({
   // =====================================================
 
   async function evaluate(exercise: ExerciseDto) {
+    if (busy) return;
     setBusy(true);
     setError("");
 
     try {
       if (exercise.kind === "CODE") {
-        const submission = await submitJava(
-          quest.slug,
-          exercise.slug,
-          code,
-        );
+        const submission = await submitJava(quest.slug, exercise.slug, code);
 
         setResult(submission);
 
@@ -142,11 +143,7 @@ export function QuestWorkspace({
     } catch (e) {
       setAnswerCorrect(false);
 
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Exercise failed",
-      );
+      setError(e instanceof Error ? e.message : "Exercise failed");
     } finally {
       setBusy(false);
     }
@@ -156,11 +153,19 @@ export function QuestWorkspace({
   // NAVIGATION
   // =====================================================
 
+  function selectItem(nextIndex: number) {
+    if (busy) return;
+    setIndex(nextIndex);
+    contentRef.current?.focus();
+    contentRef.current?.scrollIntoView({ block: "start" });
+  }
+
   function goNext() {
+    if (busy) return;
     const isLastItem = index >= items.length - 1;
 
     if (!isLastItem) {
-      setIndex((currentIndex) => currentIndex + 1);
+      selectItem(index + 1);
       return;
     }
 
@@ -178,18 +183,9 @@ export function QuestWorkspace({
 
   const completed = progress?.completedExercises ?? 0;
 
-  const totalExercises =
-    progress?.totalExercises ?? quest.exercises.length;
+  const totalExercises = progress?.totalExercises ?? quest.exercises.length;
 
-  const pct =
-    totalExercises > 0
-      ? (completed / totalExercises) * 100
-      : 0;
-
-  const itemProgress =
-    items.length > 0
-      ? Math.round(((index + 1) / items.length) * 100)
-      : 0;
+  const pct = totalExercises > 0 ? (completed / totalExercises) * 100 : 0;
 
   return (
     <div className="mx-auto w-full max-w-[1500px]">
@@ -200,16 +196,14 @@ export function QuestWorkspace({
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/courses/${quest.module.courseSlug}`}
-          className="group inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-slate-100"
+          className="group inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-slate-100"
         >
-          <span className="transition group-hover:-translate-x-0.5">
-            ←
-          </span>
+          <span className="transition group-hover:-translate-x-0.5">←</span>
 
           <span>{quest.module.title}</span>
         </Link>
 
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
           <span>Item {Math.min(index + 1, items.length)}</span>
           <span className="text-slate-700">/</span>
           <span>{items.length}</span>
@@ -221,8 +215,6 @@ export function QuestWorkspace({
       ================================================= */}
 
       <header className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 px-5 py-5 sm:px-7">
-        <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-amber-400/5 blur-3xl" />
-
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -255,38 +247,28 @@ export function QuestWorkspace({
               </span>
 
               <span className="font-bold text-slate-200">
-                {completed}/{totalExercises}
+                {progress ? `${completed}/${totalExercises}` : "Unavailable"}
               </span>
             </div>
 
-            <ProgressBar value={pct} />
+            <ProgressBar
+              value={progress ? pct : null}
+              label="Exercises completed"
+            />
           </div>
         </div>
       </header>
 
       {/* =================================================
-          MOBILE ITEM PROGRESS
-      ================================================= */}
-
-      <div className="mt-4 lg:hidden">
-        <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
-          <span>Quest path</span>
-          <span>{itemProgress}% explored</span>
-        </div>
-
-        <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
-          <div
-            className="h-full rounded-full bg-amber-400 transition-all duration-300"
-            style={{ width: `${itemProgress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* =================================================
           WORKSPACE
       ================================================= */}
 
-      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
+      {progressError && (
+        <div className="mt-4">
+          <ErrorState message={progressError} retry={loadProgress} />
+        </div>
+      )}
+      <div className="mt-5 grid items-start gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
         {/* ===============================================
             QUEST PATH
         =============================================== */}
@@ -294,22 +276,26 @@ export function QuestWorkspace({
         <aside className="lg:sticky lg:top-24">
           <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60">
             <div className="border-b border-slate-800 px-5 py-4">
-              <p className="eyebrow">Quest path</p>
+              <h2 className="eyebrow">Quest path</h2>
+              <a
+                href="#quest-content"
+                className="mt-2 inline-flex min-h-11 items-center text-sm text-amber-300 lg:hidden"
+              >
+                Jump to current item ↓
+              </a>
 
-              <p className="mt-2 text-xs leading-5 text-slate-500">
+              <p className="mt-2 text-xs leading-5 text-slate-400">
                 Learn the concept, then prove it with practice.
               </p>
             </div>
 
-            <div className="max-h-[calc(100vh-250px)] overflow-y-auto p-2">
+            <div className="max-h-60 overflow-y-auto lg:max-h-[calc(100dvh-220px)] p-2">
               {items.map((item, itemIndex) => {
                 const isCurrent = itemIndex === index;
 
                 const done =
                   item.type === "exercise" &&
-                  (progress?.completedExerciseSlugs.includes(
-                    item.slug,
-                  ) ??
+                  (progress?.completedExerciseSlugs.includes(item.slug) ??
                     false);
 
                 const visitedLesson =
@@ -319,22 +305,24 @@ export function QuestWorkspace({
                   <button
                     key={`${item.type}-${item.slug}`}
                     type="button"
-                    onClick={() => setIndex(itemIndex)}
+                    disabled={busy}
+                    aria-current={isCurrent ? "step" : undefined}
+                    onClick={() => selectItem(itemIndex)}
                     className={`group flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition ${
                       isCurrent
-                        ? "bg-amber-400 text-slate-950 shadow-lg shadow-amber-950/10"
+                        ? "bg-amber-400/10 text-amber-200 ring-1 ring-inset ring-amber-400/40"
                         : "text-slate-300 hover:bg-slate-800/70"
                     }`}
                   >
                     <span
                       className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-black ${
                         isCurrent
-                          ? "bg-slate-950/15 text-slate-950"
+                          ? "bg-amber-400 text-slate-950"
                           : done
                             ? "bg-emerald-950 text-emerald-300"
                             : visitedLesson
                               ? "bg-slate-800 text-slate-300"
-                              : "bg-slate-950 text-slate-500"
+                              : "bg-slate-950 text-slate-400"
                       }`}
                     >
                       {done
@@ -347,14 +335,11 @@ export function QuestWorkspace({
                     <span className="min-w-0">
                       <span
                         className={`block text-[10px] font-black uppercase tracking-[0.15em] ${
-                          isCurrent
-                            ? "text-slate-800/70"
-                            : "text-slate-600"
+                          isCurrent ? "text-amber-300" : "text-slate-400"
                         }`}
                       >
-                        {item.type === "lesson"
-                          ? "Learn"
-                          : "Practice"}
+                        {item.type === "lesson" ? "Learn" : "Practice"}
+                        {isCurrent ? " · Current" : done ? " · Completed" : ""}
                       </span>
 
                       <span className="mt-0.5 block text-sm font-semibold leading-5">
@@ -372,7 +357,12 @@ export function QuestWorkspace({
             CURRENT CONTENT
         =============================================== */}
 
-        <main className="min-w-0">
+        <div
+          id="quest-content"
+          ref={contentRef}
+          tabIndex={-1}
+          className="min-w-0"
+        >
           {current?.type === "lesson" ? (
             <Lesson
               title={current.title}
@@ -386,7 +376,10 @@ export function QuestWorkspace({
             <Exercise
               exercise={current}
               code={code}
-              setCode={setCode}
+              setCode={(value) => {
+                setCode(value);
+                drafts.current[current.slug] = value;
+              }}
               answer={answer}
               setAnswer={setAnswer}
               answerCorrect={answerCorrect}
@@ -394,9 +387,7 @@ export function QuestWorkspace({
               busy={busy}
               error={error}
               completed={
-                progress?.completedExerciseSlugs.includes(
-                  current.slug,
-                ) ?? false
+                progress?.completedExerciseSlugs.includes(current.slug) ?? false
               }
               onRun={() => evaluate(current)}
               onNext={goNext}
@@ -404,7 +395,7 @@ export function QuestWorkspace({
           ) : (
             <EmptyQuest />
           )}
-        </main>
+        </div>
       </div>
     </div>
   );
@@ -431,11 +422,11 @@ function Lesson({
 }) {
   return (
     <article className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60">
-      <header className="border-b border-slate-800 px-6 py-6 sm:px-8">
+      <header className="border-b border-slate-800 px-4 py-5 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="eyebrow">{kind.replace(/_/g, " ")}</p>
 
-          <span className="text-xs font-semibold text-slate-500">
+          <span className="text-xs font-semibold text-slate-400">
             {currentIndex + 1} of {totalItems}
           </span>
         </div>
@@ -445,12 +436,12 @@ function Lesson({
         </h2>
       </header>
 
-      <div className="px-6 py-7 sm:px-8 sm:py-9">
+      <div className="px-4 py-5 sm:px-6 sm:py-6">
         <div className="mx-auto max-w-4xl">
           <LessonContent content={content} />
         </div>
 
-        <div className="mx-auto mt-10 flex max-w-4xl justify-end border-t border-slate-800 pt-6">
+        <div className="mx-auto mt-6 flex max-w-4xl justify-end border-t border-slate-800 pt-6">
           <button
             type="button"
             className="btn-primary min-w-36"
@@ -526,14 +517,19 @@ function Exercise({
           </h2>
         </div>
 
-        <div className="px-6 py-6 sm:px-8">
-          <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-500">
+        <div className="px-4 py-5 sm:px-6">
+          <p className="mb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-400">
             Challenge
           </p>
 
           <div className="whitespace-pre-wrap text-[15px] leading-7 text-slate-300">
             {exercise.prompt}
           </div>
+          {isCode && (
+            <a href="#code-editor" className="btn-secondary mt-4">
+              Jump to editor ↓
+            </a>
+          )}
         </div>
       </article>
 
@@ -542,7 +538,7 @@ function Exercise({
       =============================================== */}
 
       {isCode && (
-        <section className="overflow-hidden rounded-3xl border border-slate-800 bg-[#050914] shadow-2xl shadow-black/10">
+        <section className="overflow-hidden rounded-3xl border border-slate-700 bg-[#050914]">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-slate-900/50 px-5 py-3">
             <div className="flex items-center gap-3">
               <div className="flex gap-1.5" aria-hidden="true">
@@ -556,21 +552,26 @@ function Exercise({
               </span>
             </div>
 
-            <span className="rounded-md bg-slate-950 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            <span className="rounded-md bg-slate-950 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Java 21
             </span>
           </div>
 
           <textarea
+            id="code-editor"
             aria-label="Java source code"
+            disabled={busy}
+            autoCapitalize="off"
+            autoCorrect="off"
+            wrap="off"
             spellCheck={false}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            className="min-h-[390px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-7 text-slate-100 outline-none sm:p-6"
+            className="min-h-[320px] sm:min-h-[390px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-7 text-slate-100 outline-none sm:p-6"
           />
 
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 bg-slate-900/40 px-5 py-4">
-            <p className="text-xs text-slate-500">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 bg-slate-900 px-5 py-4">
+            <p className="text-xs text-slate-400">
               Run your solution against the challenge tests.
             </p>
 
@@ -579,6 +580,7 @@ function Exercise({
                 <button
                   type="button"
                   className="btn-secondary"
+                  disabled={busy}
                   onClick={onNext}
                 >
                   Continue →
@@ -649,13 +651,9 @@ function Exercise({
             </span>
 
             <div>
-              <p className="font-bold text-red-300">
-                Not quite yet
-              </p>
+              <p className="font-bold text-red-300">Not quite yet</p>
 
-              <p className="mt-1 text-sm leading-6 text-red-200/70">
-                {error}
-              </p>
+              <p className="mt-1 text-sm leading-6 text-red-200">{error}</p>
             </div>
           </div>
         </div>
@@ -702,11 +700,9 @@ function NonCodeAnswer({
       {!solved ? (
         <>
           <div className="border-b border-slate-800 px-6 py-4 sm:px-8">
-            <p className="text-sm font-bold text-slate-200">
-              {label}
-            </p>
+            <p className="text-sm font-bold text-slate-200">{label}</p>
 
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-400">
               Enter your answer exactly as Java would produce it.
             </p>
           </div>
@@ -721,16 +717,12 @@ function NonCodeAnswer({
               autoComplete="off"
               onChange={(e) => setAnswer(e.target.value)}
               onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  answer.trim() &&
-                  !busy
-                ) {
+                if (e.key === "Enter" && answer.trim() && !busy) {
                   onRun();
                 }
               }}
               placeholder={placeholder}
-              className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-5 py-4 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10"
+              className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-5 py-4 font-mono text-sm text-slate-100 outline-none transition placeholder:text-slate-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/10"
             />
 
             <div className="mt-4 flex justify-end">
@@ -754,11 +746,9 @@ function NonCodeAnswer({
               </span>
 
               <div>
-                <p className="font-black text-emerald-300">
-                  Correct answer
-                </p>
+                <p className="font-black text-emerald-300">Correct answer</p>
 
-                <p className="mt-1 text-sm text-emerald-200/60">
+                <p className="mt-1 text-sm text-emerald-200">
                   Nice work. This exercise is complete.
                 </p>
               </div>
@@ -782,16 +772,10 @@ function NonCodeAnswer({
 // RESULT PANEL
 // =====================================================
 
-function ResultPanel({
-  result,
-}: {
-  result: SubmissionResultDto;
-}) {
+function ResultPanel({ result }: { result: SubmissionResultDto }) {
   const passed = result.status === "PASSED";
 
-  const passedTests = result.tests.filter(
-    (test) => test.passed,
-  ).length;
+  const passedTests = result.tests.filter((test) => test.passed).length;
 
   return (
     <section
@@ -817,17 +801,13 @@ function ResultPanel({
           <div>
             <p
               className={`font-black ${
-                passed
-                  ? "text-emerald-300"
-                  : "text-red-300"
+                passed ? "text-emerald-300" : "text-red-300"
               }`}
             >
-              {passed
-                ? "All tests passed"
-                : "Keep iterating"}
+              {passed ? "All tests passed" : "Keep iterating"}
             </p>
 
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-400">
               {passedTests}/{result.tests.length} tests passed ·{" "}
               {result.runtimeMs ?? 0} ms
             </p>
@@ -858,7 +838,10 @@ function ResultPanel({
               Error
             </p>
 
-            <pre className="overflow-auto rounded-xl border border-red-950 bg-slate-950 p-4 text-sm leading-6 text-red-200">
+            <pre
+              tabIndex={0}
+              className="max-h-80 overflow-auto rounded-xl border border-red-950 bg-slate-950 p-4 text-sm leading-6 text-red-200"
+            >
               {result.errorText}
             </pre>
           </div>
@@ -874,24 +857,18 @@ function ResultPanel({
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-2 w-2 rounded-full ${
-                      test.passed
-                        ? "bg-emerald-400"
-                        : "bg-red-400"
+                      test.passed ? "bg-emerald-400" : "bg-red-400"
                     }`}
                   />
 
                   <span className="text-sm font-semibold text-slate-300">
-                    {test.hidden
-                      ? "Hidden test"
-                      : `Test ${test.position}`}
+                    {test.hidden ? "Hidden test" : `Test ${test.position}`}
                   </span>
                 </div>
 
                 <span
                   className={`text-xs font-bold ${
-                    test.passed
-                      ? "text-emerald-300"
-                      : "text-red-300"
+                    test.passed ? "text-emerald-300" : "text-red-300"
                   }`}
                 >
                   {test.passed ? "Passed" : "Failed"}
@@ -900,12 +877,11 @@ function ResultPanel({
 
               {!test.hidden &&
                 !test.passed &&
-                (test.expectedOutput !== null ||
-                  test.stdout !== null) && (
+                (test.expectedOutput !== null || test.stdout !== null) && (
                   <div className="grid gap-px border-t border-slate-800 bg-slate-800 md:grid-cols-2">
                     {test.expectedOutput !== null && (
                       <div className="bg-slate-950 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
                           Expected
                         </p>
 
@@ -917,7 +893,7 @@ function ResultPanel({
 
                     {test.stdout !== null && (
                       <div className="bg-slate-950 p-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
+                        <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
                           Your output
                         </p>
 
@@ -951,7 +927,7 @@ function EmptyQuest() {
         Nothing here yet
       </h2>
 
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="mt-2 text-sm text-slate-400">
         This quest does not have any learning content yet.
       </p>
     </div>

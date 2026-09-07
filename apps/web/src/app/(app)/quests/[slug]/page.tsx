@@ -62,6 +62,7 @@ export default function QuestPage() {
 
   return quest ? (
     <QuestWorkspace
+      key={quest.slug}
       quest={quest}
       nextQuestSlug={nextQuestSlug}
     />
