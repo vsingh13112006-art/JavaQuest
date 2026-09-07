@@ -18,9 +18,7 @@ export function GamificationSummary() {
       .then(setData)
       .catch((e) =>
         setError(
-          e instanceof Error
-            ? e.message
-            : "Could not load learner stats",
+          e instanceof Error ? e.message : "Could not load learner stats",
         ),
       );
   }, []);
@@ -38,19 +36,17 @@ export function GamificationSummary() {
   }
 
   const levelProgress = data.nextLevelXp
-    ? Math.min(
-        100,
-        Math.round(
-          (data.currentLevelXp / data.nextLevelXp) * 100,
-        ),
-      )
+    ? Math.min(100, Math.round((data.currentLevelXp / data.nextLevelXp) * 100))
     : 0;
 
   const visibleAchievements = data.achievements.slice(0, 3);
   const visibleXp = data.recentXp.slice(0, 5);
 
   return (
-    <section className="mt-6">
+    <section className="mt-6" aria-labelledby="rewards-heading">
+      <h2 id="rewards-heading" className="mb-4 text-xl font-bold">
+        Your learning rewards
+      </h2>
       {/* =================================================
           XP SUMMARY
       ================================================= */}
@@ -61,7 +57,7 @@ export function GamificationSummary() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
                 Level
               </p>
 
@@ -76,17 +72,11 @@ export function GamificationSummary() {
           </div>
 
           <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="text-slate-500">
-                {data.currentLevelXp}/{data.nextLevelXp} XP
-              </span>
-
-              <span className="font-bold text-amber-300">
-                {levelProgress}%
-              </span>
-            </div>
-
-            <ProgressBar value={levelProgress} />
+            <ProgressBar value={levelProgress} label="Next level" />
+            <p className="mt-2 text-xs text-slate-400">
+              {data.currentLevelXp.toLocaleString()} /{" "}
+              {data.nextLevelXp.toLocaleString()} XP
+            </p>
           </div>
         </div>
 
@@ -95,7 +85,7 @@ export function GamificationSummary() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
                 Total XP
               </p>
 
@@ -109,7 +99,7 @@ export function GamificationSummary() {
             </div>
           </div>
 
-          <p className="mt-5 text-sm leading-6 text-slate-500">
+          <p className="mt-5 text-sm leading-6 text-slate-400">
             Complete quests and exercises to keep earning XP.
           </p>
         </div>
@@ -119,13 +109,13 @@ export function GamificationSummary() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
                 Learning streak
               </p>
 
               <p className="mt-2 text-3xl font-black text-slate-100">
                 {data.currentStreak}
-                <span className="ml-2 text-base font-semibold text-slate-500">
+                <span className="ml-2 text-base font-semibold text-slate-400">
                   days
                 </span>
               </p>
@@ -136,7 +126,7 @@ export function GamificationSummary() {
             </div>
           </div>
 
-          <p className="mt-5 text-sm text-slate-500">
+          <p className="mt-5 text-sm text-slate-400">
             Longest streak:{" "}
             <span className="font-semibold text-slate-300">
               {data.longestStreak} days
@@ -155,11 +145,9 @@ export function GamificationSummary() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/50">
           <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
             <div>
-              <p className="text-sm font-bold text-slate-200">
-                Achievements
-              </p>
+              <h3 className="text-sm font-bold text-slate-200">Achievements</h3>
 
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 Milestones you've unlocked
               </p>
             </div>
@@ -183,11 +171,11 @@ export function GamificationSummary() {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-slate-200">
+                    <p className="break-words text-sm font-bold text-slate-200">
                       {achievement.title}
                     </p>
 
-                    <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+                    <p className="mt-0.5 text-xs text-slate-400">
                       {achievement.description}
                     </p>
                   </div>
@@ -195,13 +183,13 @@ export function GamificationSummary() {
               ))}
             </div>
           ) : (
-            <p className="px-5 py-6 text-sm text-slate-500">
+            <p className="px-5 py-6 text-sm text-slate-400">
               Complete your first exercise to unlock an achievement.
             </p>
           )}
 
           {data.achievements.length > 3 && (
-            <div className="border-t border-slate-800 px-5 py-3 text-xs text-slate-500">
+            <div className="border-t border-slate-800 px-5 py-3 text-xs text-slate-400">
               +{data.achievements.length - 3} more achievements unlocked
             </div>
           )}
@@ -212,11 +200,9 @@ export function GamificationSummary() {
         <div className="rounded-2xl border border-slate-800 bg-slate-900/50">
           <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
             <div>
-              <p className="text-sm font-bold text-slate-200">
-                Recent XP
-              </p>
+              <h3 className="text-sm font-bold text-slate-200">Recent XP</h3>
 
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-slate-400">
                 Latest learning rewards
               </p>
             </div>
@@ -234,29 +220,27 @@ export function GamificationSummary() {
                   className="flex items-center justify-between gap-4 px-5 py-3"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-slate-200">
+                    <p className="break-words text-sm font-semibold text-slate-200">
                       {event.reason}
                     </p>
 
-                    <p className="mt-1 text-xs text-slate-600">
-                      {new Date(event.createdAt).toLocaleDateString(
-                        undefined,
-                        {
-                          month: "short",
-                          day: "numeric",
-                        },
-                      )}
+                    <p className="mt-1 text-xs text-slate-400">
+                      {new Date(event.createdAt).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </p>
                   </div>
 
                   <span className="shrink-0 text-sm font-black text-amber-300">
-                    +{event.amount} XP
+                    {event.amount > 0 ? "+" : ""}
+                    {event.amount.toLocaleString()} XP
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="px-5 py-6 text-sm text-slate-500">
+            <p className="px-5 py-6 text-sm text-slate-400">
               Your XP history will appear here.
             </p>
           )}

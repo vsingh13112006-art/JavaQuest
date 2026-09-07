@@ -3,20 +3,48 @@ import remarkGfm from "remark-gfm";
 
 export function LessonContent({ content }: { content: string }) {
   return (
-    <div className="max-w-3xl text-slate-300">
+    <div className="lesson-content min-w-0 max-w-3xl text-slate-300">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h2: ({ children }) => (
-            <h2 className="mb-4 mt-10 text-2xl font-black text-white">
+          h1: ({ children }) => (
+            <h3 className="mb-4 mt-6 text-2xl font-bold text-white">
               {children}
-            </h2>
+            </h3>
+          ),
+          table: ({ children }) => (
+            <div
+              className="my-6 max-w-full overflow-x-auto"
+              role="region"
+              aria-label="Lesson table"
+              tabIndex={0}
+            >
+              <table className="w-full border-collapse text-left text-sm">
+                {children}
+              </table>
+            </div>
+          ),
+          th: ({ children }) => (
+            <th className="border border-slate-700 p-3 text-slate-100">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="border border-slate-800 p-3">{children}</td>
+          ),
+          ol: ({ children }) => (
+            <ol className="my-5 list-decimal space-y-2 pl-6">{children}</ol>
+          ),
+          h2: ({ children }) => (
+            <h3 className="mb-4 mt-10 text-2xl font-black text-white">
+              {children}
+            </h3>
           ),
 
           h3: ({ children }) => (
-            <h3 className="mb-3 mt-8 text-xl font-bold text-white">
+            <h4 className="mb-3 mt-8 text-xl font-bold text-white">
               {children}
-            </h3>
+            </h4>
           ),
 
           p: ({ children }) => (
@@ -30,19 +58,17 @@ export function LessonContent({ content }: { content: string }) {
           ),
 
           ul: ({ children }) => (
-            <ul className="my-5 space-y-3 pl-6">{children}</ul>
+            <ul className="my-5 list-disc space-y-3 pl-6">{children}</ul>
           ),
 
           li: ({ children }) => (
-            <li className="list-disc leading-7 text-slate-300">
-              {children}
-            </li>
+            <li className="leading-7 text-slate-300">{children}</li>
           ),
 
           blockquote: ({ children }) => (
-            <div className="my-7 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-5 py-1">
+            <blockquote className="my-7 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-5 py-1">
               {children}
-            </div>
+            </blockquote>
           ),
 
           code: ({ className, children, ...props }) => {
@@ -71,11 +97,17 @@ export function LessonContent({ content }: { content: string }) {
 
           pre: ({ children }) => (
             <div className="my-7 overflow-hidden rounded-2xl border border-slate-700 bg-[#050914]">
-              <div className="border-b border-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className="border-b border-slate-800 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400">
                 Java
               </div>
 
-              <pre className="overflow-x-auto p-5">{children}</pre>
+              <pre
+                tabIndex={0}
+                aria-label="Code example"
+                className="overflow-x-auto p-5"
+              >
+                {children}
+              </pre>
             </div>
           ),
         }}
