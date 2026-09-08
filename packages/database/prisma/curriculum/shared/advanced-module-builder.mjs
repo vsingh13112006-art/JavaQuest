@@ -1,4 +1,4 @@
-function lessonContent(spec, moduleTitle) {
+function lessonContent(spec) {
   return String.raw`
 ${spec.intro}
 
@@ -132,7 +132,7 @@ export function buildAdvancedModule(meta, specs) {
                 title: spec.lessonTitle ?? spec.title,
                 kind: spec.recap ? "RECAP" : "THEORY",
                 position: 1,
-                content: lessonContent(spec, meta.title),
+                content: lessonContent(spec),
               },
               {
                 slug: `${spec.slug}-example`,
