@@ -3,6 +3,7 @@ import { randomBytes, scrypt } from "node:crypto";
 import { promisify } from "node:util";
 
 import { javaMasteryModules } from "./curriculum/index.mjs";
+import { dsaProblems } from "./dsa-problems.mjs";
 
 const prisma = new PrismaClient();
 
@@ -272,6 +273,17 @@ async function main() {
     course.id,
     javaMasteryModules,
   );
+
+  for (const problem of dsaProblems) {
+    if (!/^https:\/\/(www\.)?hackerrank\.com\/challenges\/[^\s/]+/.test(problem.hackerRankUrl)) {
+      throw new Error(`Invalid HackerRank challenge URL for ${problem.slug}`);
+    }
+    await prisma.dsaProblem.upsert({
+      where: { slug: problem.slug },
+      update: problem,
+      create: problem,
+    });
+  }
 
   console.log(
     "Safely synced Java Foundations curriculum.",

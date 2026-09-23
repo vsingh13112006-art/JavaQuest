@@ -10,11 +10,14 @@ import { gamificationRouter } from "../modules/gamification/gamification.routes.
 import { adminRouter } from "../modules/admin/admin.routes.js";
 import { metricsRouter } from "../modules/metrics/metrics.routes.js";
 
+import { practiceRouter } from "../modules/practice/practice.routes.js";
+
 export const rootRouter = Router();
 
 rootRouter.use("/health", healthRouter);
 rootRouter.use(authRouter);
 rootRouter.use("/courses", coursesRouter);
+rootRouter.use("/practice", practiceRouter);
 rootRouter.use("/quests", questsRouter);
 
 rootRouter.use(enrollmentRouter);
