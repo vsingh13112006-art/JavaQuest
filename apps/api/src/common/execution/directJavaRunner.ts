@@ -47,16 +47,25 @@ function runProcess(
       outputLimitExceeded = false,
       infrastructureFailed = false,
       stopped = false,
+      exited = false,
       terminationRequested = false;
+    let drainTimer: ReturnType<typeof setTimeout> | undefined;
+    const destroyStreams = () => {
+      child.stdin.destroy();
+      child.stdout.destroy();
+      child.stderr.destroy();
+    };
     const terminate = () => {
       if (terminationRequested) return;
       terminationRequested = true;
       try {
         if (grouped && child.pid) process.kill(-child.pid, "SIGKILL");
-        else child.kill("SIGKILL");
-      } catch {
-        // A vanished group is harmless; still try the child itself if group kill fails.
-        child.kill("SIGKILL");
+        else if (!exited) child.kill("SIGKILL");
+      } catch (error) {
+        // ESRCH is expected after normal exit. Do not signal a reaped leader.
+        if ((error as NodeJS.ErrnoException).code !== "ESRCH")
+          infrastructureFailed = true;
+        if (!exited) child.kill("SIGKILL");
       }
     };
     const stop = () => {
@@ -64,9 +73,8 @@ function runProcess(
       stopped = true;
       clearTimeout(timer);
       terminate();
-      child.stdin.destroy();
-      child.stdout.destroy();
-      child.stderr.destroy();
+      clearTimeout(drainTimer);
+      destroyStreams();
     };
     const timer = setTimeout(() => {
       if (!stopped) {
@@ -100,10 +108,23 @@ function runProcess(
       infrastructureFailed = true;
       stop();
     });
-    // Kill remaining group members even when Main exits normally.
-    child.on("exit", terminate);
-    child.on("close", (exitCode) => {
+    child.on("exit", () => {
+      exited = true;
+      // exit means the leader is finished; close additionally waits for its pipes.
+      // Never classify pipe draining/descendant cleanup as an execution timeout.
       clearTimeout(timer);
+      // Descendants can inherit these pipes, so waiting for close before killing
+      // the group would deadlock. Keep immediate group cleanup on normal exit.
+      terminate();
+      if (!stopped) {
+        // Bound pipe draining independently, without changing the exit result.
+        drainTimer = setTimeout(destroyStreams, 1000);
+      }
+    });
+    child.on("close", (exitCode) => {
+      stopped = true;
+      clearTimeout(timer);
+      clearTimeout(drainTimer);
       if (infrastructureFailed) {
         reject(
           new AppError(
