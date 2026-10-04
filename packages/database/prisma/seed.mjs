@@ -379,9 +379,25 @@ const exerciseSlugMigrations = {
   "inheritance-parent-aur-child-class-check":
     "inheritance-parent-aur-child-class-concept-check",
 
-  // Week 5 legacy migration
+  // Week 5 — Module 33 legacy migrations.
+  // Each mapping only runs when the new slug exists in current source and
+  // the old slug exists for the same quest, preserving the Exercise row/ID.
   "arraylist-list-why-list-check":
     "arraylist-list-why-list-concept-check",
+  "arraylist-list-create-arraylist-check":
+    "arraylist-list-create-arraylist-concept-check",
+  "arraylist-list-add-and-get-check":
+    "arraylist-list-add-and-get-concept-check",
+  "arraylist-list-set-and-remove-check":
+    "arraylist-list-set-and-remove-concept-check",
+  "arraylist-list-size-and-contains-check":
+    "arraylist-list-size-and-contains-concept-check",
+  "arraylist-list-loop-through-list-check":
+    "arraylist-list-loop-through-list-concept-check",
+  "arraylist-list-list-of-objects-check":
+    "arraylist-list-list-of-objects-concept-check",
+  "arraylist-list-list-recap-check":
+    "arraylist-list-list-recap-concept-check",
 };
 
 
