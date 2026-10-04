@@ -43,3 +43,6 @@ temp/
 
 # Archives
 *.zip
+
+# Generated from pinned monaco-editor dependency
+/apps/web/public/monaco/

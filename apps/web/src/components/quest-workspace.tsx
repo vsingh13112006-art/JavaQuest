@@ -1,6 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const JavaCodeEditor = dynamic(() => import("./java-code-editor"), {
+  ssr: false,
+});
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -54,7 +59,7 @@ export function QuestWorkspace({
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState<QuestProgressDto | null>(null);
 
-  const [code, setCode] = useState(quest.exercises[0]?.starterCode ?? "");
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<SubmissionResultDto | null>(null);
@@ -65,7 +70,11 @@ export function QuestWorkspace({
   const current = items[index];
   const contentRef = useRef<HTMLDivElement>(null);
   const [progressError, setProgressError] = useState("");
-  const drafts = useRef<Record<string, string>>({});
+  const codeIdentity = `${quest.slug}/${current?.slug ?? ""}`;
+  const code =
+    current?.type === "exercise"
+      ? (drafts[codeIdentity] ?? current.starterCode ?? "")
+      : "";
 
   // =====================================================
   // START QUEST
@@ -93,10 +102,6 @@ export function QuestWorkspace({
   // =====================================================
 
   useEffect(() => {
-    if (current?.type === "exercise") {
-      setCode(drafts.current[current.slug] ?? current.starterCode ?? "");
-    }
-
     setAnswer("");
     setAnswerCorrect(false);
     setResult(null);
@@ -374,11 +379,15 @@ export function QuestWorkspace({
             />
           ) : current?.type === "exercise" ? (
             <Exercise
+              key={codeIdentity}
+              identity={codeIdentity}
               exercise={current}
               code={code}
               setCode={(value) => {
-                setCode(value);
-                drafts.current[current.slug] = value;
+                setDrafts((previous) => ({
+                  ...previous,
+                  [codeIdentity]: value,
+                }));
               }}
               answer={answer}
               setAnswer={setAnswer}
@@ -461,6 +470,7 @@ function Lesson({
 // =====================================================
 
 function Exercise({
+  identity,
   exercise,
   code,
   setCode,
@@ -474,6 +484,7 @@ function Exercise({
   onRun,
   onNext,
 }: {
+  identity: string;
   exercise: ExerciseDto;
   code: string;
   setCode: (value: string) => void;
@@ -552,22 +563,34 @@ function Exercise({
               </span>
             </div>
 
+            <button
+              type="button"
+              disabled={busy}
+              className="text-xs text-slate-300 hover:text-amber-300 disabled:opacity-50"
+              onClick={() => {
+                const starter = exercise.starterCode ?? "";
+                if (
+                  code === starter ||
+                  window.confirm(
+                    "Current edits hata kar starter code restore karein?",
+                  )
+                )
+                  setCode(starter);
+              }}
+            >
+              Reset code
+            </button>
             <span className="rounded-md bg-slate-950 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               Java 21
             </span>
           </div>
 
-          <textarea
-            id="code-editor"
-            aria-label="Java source code"
-            disabled={busy}
-            autoCapitalize="off"
-            autoCorrect="off"
-            wrap="off"
-            spellCheck={false}
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="min-h-[320px] sm:min-h-[390px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-7 text-slate-100 outline-none sm:p-6"
+          <JavaCodeEditor
+            identity={identity}
+            code={code}
+            onChange={setCode}
+            busy={busy}
+            onRun={onRun}
           />
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 bg-slate-900 px-5 py-4">
