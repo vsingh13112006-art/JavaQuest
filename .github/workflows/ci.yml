@@ -49,6 +49,14 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Verify Java toolchain
+        run: |
+          which java
+          which javac
+          java -version
+          javac -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
